@@ -181,6 +181,41 @@ import SnapKit
         foregroundPath.fill()
     }
     
+    // MARK: - Touches
+    
+    override public func touchesBegan(touches: Set<UITouch>, withEvent event: UIEvent?) {
+//        touch = touches.first
+        selected = true
+        
+//        if let location = touch?.locationInView(self) {
+//            percentage = percentageForLocation(location)
+//        }
+        
+        super.touchesBegan(touches, withEvent: event)
+    }
+    
+    override public func touchesMoved(touches: Set<UITouch>, withEvent event: UIEvent?) {
+//        if let location = touch?.locationInView(self) {
+//            percentage = percentageForLocation(location)
+//        }
+        
+        super.touchesMoved(touches, withEvent: event)
+    }
+    
+    override public func touchesCancelled(touches: Set<UITouch>?, withEvent event: UIEvent?) {
+//        touch = nil
+        selected = false
+        
+        super.touchesCancelled(touches, withEvent: event)
+    }
+    
+    override public func touchesEnded(touches: Set<UITouch>, withEvent event: UIEvent?) {
+//        touch = nil
+        selected = false
+        
+        super.touchesEnded(touches, withEvent: event)
+    }
+    
     // MARK: Private getters
     
     private var hue: CGFloat {
