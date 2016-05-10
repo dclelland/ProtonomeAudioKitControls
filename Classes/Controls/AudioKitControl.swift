@@ -108,7 +108,9 @@ import SnapKit
     }
     
     private var scaleSteps: [Double]? {
-        return nil // separate valueSteps by whitespace and commas, convert to doubles, prune nils, return nil if empty array
+        // TODO: this
+        // separate valueSteps by whitespace and commas, convert to doubles, prune nils, return nil if empty array
+        return nil
     }
     
     @IBInspectable public var scaleLogarithmic: Bool = false {
@@ -183,37 +185,50 @@ import SnapKit
     
     // MARK: - Touches
     
+    private var touch: UITouch? {
+        didSet {
+            selected = touch != nil
+        }
+    }
+    
     override public func touchesBegan(touches: Set<UITouch>, withEvent event: UIEvent?) {
-//        touch = touches.first
-        selected = true
+        touch = touches.first
         
-//        if let location = touch?.locationInView(self) {
-//            percentage = percentageForLocation(location)
-//        }
+        if let location = touch?.locationInView(self) {
+            value = scale.value(forPercentage: percentage(forLocation: location))
+        }
         
         super.touchesBegan(touches, withEvent: event)
     }
     
     override public func touchesMoved(touches: Set<UITouch>, withEvent event: UIEvent?) {
-//        if let location = touch?.locationInView(self) {
-//            percentage = percentageForLocation(location)
-//        }
+        if let location = touch?.locationInView(self) {
+            value = scale.value(forPercentage: percentage(forLocation: location))
+        }
         
         super.touchesMoved(touches, withEvent: event)
     }
     
     override public func touchesCancelled(touches: Set<UITouch>?, withEvent event: UIEvent?) {
-//        touch = nil
-        selected = false
+        touch = nil
         
         super.touchesCancelled(touches, withEvent: event)
     }
     
     override public func touchesEnded(touches: Set<UITouch>, withEvent event: UIEvent?) {
-//        touch = nil
-        selected = false
+        touch = nil
         
         super.touchesEnded(touches, withEvent: event)
+    }
+    
+    // MARK: - Overrideables
+    
+    func percentage(forLocation location: CGPoint) -> Double {
+        return 0.0
+    }
+    
+    func path(forPercentage percentage: Double) -> UIBezierPath {
+        return UIBezierPath()
     }
     
     // MARK: Private getters
@@ -235,7 +250,7 @@ import SnapKit
     }
     
     private var foregroundPath: UIBezierPath {
-        return UIBezierPath()
+        return path(forPercentage: scale.percentage(forValue: value))
     }
     
     private var foregroundPathColor: UIColor {
