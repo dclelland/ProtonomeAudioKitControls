@@ -92,61 +92,7 @@ import SnapKit
     
     // MARK: Scale
     
-    enum Scale {
-        case Linear(min: Double, max: Double)
-        case LinearStep(min: Double, max: Double)
-        case Logarithmic(min: Double, max: Double)
-        case LogarithmicStep(min: Double, max: Double)
-        
-        /// Note that this is non transitive when values contains non unique elements
-        case Step(steps: [Double])
-        
-        func value(forPercentage percentage: Double) -> Double {
-            switch self {
-            case .Linear(let min, let max):
-                return percentage.lerp(min: min, max: max)
-            case .LinearStep(let min, let max):
-                return round(percentage.lerp(min: min, max: max))
-            case .Logarithmic(let min, let max):
-                return pow(percentage, Double(M_E)).lerp(min: min, max: max)
-            case .LogarithmicStep(let min, let max):
-                return round(pow(percentage, Double(M_E)).lerp(min: min, max: max))
-            case .Step(let steps):
-                let index = Int(round(percentage * Double(steps.count)))
-                switch index {
-                case (.min)..<0:
-                    return steps.first!
-                case 0..<steps.count:
-                    return steps[index]
-                case steps.count...(.max):
-                    return steps.last!
-                }
-            }
-        }
-        
-        func percentage(forValue value: Double) -> Double {
-            switch self {
-            case .Linear(let min, let max):
-                return value.ilerp(min: min, max: max)
-            case .LinearStep(let min, let max):
-                return round(value).ilerp(min: min, max: max)
-            case .Logarithmic(let min, let max):
-                return pow(value.ilerp(min: min, max: max), 1.0 / Double(M_E))
-            case .LogarithmicStep(let min, let max):
-                return pow(round(value).ilerp(min: min, max: max), 1.0 / Double(M_E))
-            case .Step(let steps):
-                if let index = steps.indexOf(value) {
-                    return Double(index)
-                } else {
-                    return 0.0
-                }
-            }
-        }
-    }
-    
-    // This should be the other way around, the scale should be a value that retains state...
-    
-    var scale: Scale {
+    var scale: AudioKitControlScale {
         switch (scaleLogarithmic, scaleStep, scaleSteps) {
         case (false, false, nil):
             return .Linear(min: valueMin, max: valueMax)
@@ -161,6 +107,10 @@ import SnapKit
         }
     }
     
+    private var scaleSteps: [Double]? {
+        return nil // separate valueSteps by whitespace and commas, convert to doubles, prune nils, return nil if empty array
+    }
+    
     @IBInspectable public var scaleLogarithmic: Bool = false {
         didSet {
             setNeedsDisplay()
@@ -171,10 +121,6 @@ import SnapKit
         didSet {
             setNeedsDisplay()
         }
-    }
-    
-    private var scaleSteps: [Double]? {
-        return nil
     }
     
     // MARK: Corner radius
@@ -224,24 +170,95 @@ import SnapKit
         }
     }
     
-    // MARK: - Scale
-    
-    // MARK - Overrides
-    
     public override func drawRect(rect: CGRect) {
-        let backgroundPath = UIBezierPath(roundedRect: rect, cornerRadius: cornerRadius)
-        
         let context = UIGraphicsGetCurrentContext()
         
-        CGContextSetFillColorWithColor(context, UIColor.whiteColor().CGColor)
+        CGContextSetFillColorWithColor(context, backgroundPathColor.CGColor)
         backgroundPath.fill()
         backgroundPath.addClip()
+        
+        CGContextSetFillColorWithColor(context, foregroundPathColor.CGColor)
+        foregroundPath.fill()
+    }
+    
+    // MARK: Private getters
+    
+    private var hue: CGFloat {
+        return CGFloat(scale.percentage(forValue: value).lerp(min: 215.0, max: 0.0) / 360.0)
+    }
+    
+    private var backgroundPath: UIBezierPath {
+        return UIBezierPath(roundedRect: bounds, cornerRadius: cornerRadius)
+    }
+    
+    private var backgroundPathColor: UIColor {
+        if (highlighted || selected) {
+            return UIColor.protonome_mediumColor(withHue: hue)
+        } else {
+            return UIColor.protonome_darkColor(withHue: hue)
+        }
+    }
+    
+    private var foregroundPath: UIBezierPath {
+        return UIBezierPath()
+    }
+    
+    private var foregroundPathColor: UIColor {
+        return UIColor.protonome_lightColor(withHue: hue)
     }
 
 }
 
-// MARK: - Private getters
+// MARK: - Scale
 
-private extension AudioKitControl {
+public enum AudioKitControlScale {
+    case Linear(min: Double, max: Double)
+    case LinearStep(min: Double, max: Double)
+    case Logarithmic(min: Double, max: Double)
+    case LogarithmicStep(min: Double, max: Double)
     
+    /// Note that this is non transitive when values contains non unique elements
+    case Step(steps: [Double])
+    
+    public func value(forPercentage percentage: Double) -> Double {
+        switch self {
+        case .Linear(let min, let max):
+            return percentage.lerp(min: min, max: max)
+        case .LinearStep(let min, let max):
+            return round(percentage.lerp(min: min, max: max))
+        case .Logarithmic(let min, let max):
+            return pow(percentage, Double(M_E)).lerp(min: min, max: max)
+        case .LogarithmicStep(let min, let max):
+            return round(pow(percentage, Double(M_E)).lerp(min: min, max: max))
+        case .Step(let steps):
+            let index = Int(round(percentage * Double(steps.count)))
+            switch index {
+            case (.min)..<0:
+                return steps.first!
+            case 0..<steps.count:
+                return steps[index]
+            case steps.count...(.max):
+                return steps.last!
+            }
+        }
+    }
+    
+    public func percentage(forValue value: Double) -> Double {
+        switch self {
+        case .Linear(let min, let max):
+            return value.ilerp(min: min, max: max)
+        case .LinearStep(let min, let max):
+            return round(value).ilerp(min: min, max: max)
+        case .Logarithmic(let min, let max):
+            return pow(value.ilerp(min: min, max: max), 1.0 / Double(M_E))
+        case .LogarithmicStep(let min, let max):
+            return pow(round(value).ilerp(min: min, max: max), 1.0 / Double(M_E))
+        case .Step(let steps):
+            if let index = steps.indexOf(value) {
+                return Double(index)
+            } else {
+                return 0.0
+            }
+        }
+    }
 }
