@@ -162,6 +162,8 @@ import SnapKit
     public override func drawRect(rect: CGRect) {
         let context = UIGraphicsGetCurrentContext()
         
+        CGContextClearRect(context, rect)
+        
         CGContextSetFillColorWithColor(context, backgroundPathColor.CGColor)
         backgroundPath.fill()
         backgroundPath.addClip()
