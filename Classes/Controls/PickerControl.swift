@@ -8,6 +8,6 @@
 
 import UIKit
 
-@IBDesignable public class PickerControl: AudioKitControl {
+@IBDesignable public class PickerControl: ParameterControl {
     
 }

@@ -8,6 +8,6 @@
 
 import UIKit
 
-@IBDesignable public class SliderControl: AudioKitControl {
+@IBDesignable public class SliderControl: ParameterControl {
     
 }

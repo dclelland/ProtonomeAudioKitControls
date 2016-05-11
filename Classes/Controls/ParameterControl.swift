@@ -1,5 +1,5 @@
 //
-//  AudioKitControl.swift
+//  ParameterControl.swift
 //  ProtonomeAudioKitControls
 //
 //  Created by Daniel Clelland on 5/12/15.
@@ -10,18 +10,15 @@ import UIKit
 import Lerp
 import SnapKit
 
-@IBDesignable public class AudioKitControl: UIControl {
+@IBDesignable public class ParameterControl: UIControl {
     
-    // MARK: - Inspectable properties
+    // MARK: - Properties
     
     // MARK: Title
     
     @IBInspectable public var title: String? {
-        set {
-            titleLabel.text = newValue
-        }
-        get {
-            return titleLabel.text
+        didSet {
+            titleLabel.text = title
         }
     }
     
@@ -51,34 +48,22 @@ import SnapKit
         }
     }
     
-    // MARK: Color
-    
-    @IBInspectable public var textColor: UIColor {
-        set {
-            titleLabel.textColor = newValue
-        }
-        get {
-            return titleLabel.textColor
-        }
-    }
-    
     // MARK: Value
     
-    @IBInspectable public var value: Double = 0.0 {
+    @IBInspectable public var value: Float = 0.0 {
         didSet {
-//            valueLabel.text = valueText
             setNeedsDisplay()
             sendActionsForControlEvents([.ValueChanged])
         }
     }
     
-    @IBInspectable public var valueMin: Double = 0.0 {
+    @IBInspectable public var valueMin: Float = 0.0 {
         didSet {
             setNeedsDisplay()
         }
     }
     
-    @IBInspectable public var valueMax: Double = 1.0 {
+    @IBInspectable public var valueMax: Float = 1.0 {
         didSet {
             setNeedsDisplay()
         }
@@ -107,7 +92,7 @@ import SnapKit
         }
     }
     
-    private var scaleSteps: [Double]? {
+    private var scaleSteps: [Float]? {
         // TODO: this
         // separate valueSteps by whitespace and commas, convert to doubles, prune nils, return nil if empty array
         return nil
@@ -138,6 +123,7 @@ import SnapKit
     public lazy var titleLabel: UILabel = {
         let label = UILabel()
         label.textAlignment = .Center
+        label.textColor = UIColor.protonome_blackColor()
         return label
     }()
     
@@ -165,6 +151,7 @@ import SnapKit
         super.updateConstraints()
         
         addSubview(titleLabel)
+        titleLabel.setContentHuggingPriority(UILayoutPriorityRequired, forAxis: .Vertical)
         titleLabel.snp_updateConstraints { make in
             make.left.equalTo(self.snp_leftMargin)
             make.right.equalTo(self.snp_rightMargin)
@@ -223,11 +210,11 @@ import SnapKit
     
     // MARK: - Overrideables
     
-    func percentage(forLocation location: CGPoint) -> Double {
+    func percentage(forLocation location: CGPoint) -> Float {
         return 0.0
     }
     
-    func path(forPercentage percentage: Double) -> UIBezierPath {
+    func path(forPercentage percentage: Float) -> UIBezierPath {
         return UIBezierPath()
     }
     
@@ -262,26 +249,26 @@ import SnapKit
 // MARK: - Scale
 
 public enum AudioKitControlScale {
-    case Linear(min: Double, max: Double)
-    case LinearStep(min: Double, max: Double)
-    case Logarithmic(min: Double, max: Double)
-    case LogarithmicStep(min: Double, max: Double)
+    case Linear(min: Float, max: Float)
+    case LinearStep(min: Float, max: Float)
+    case Logarithmic(min: Float, max: Float)
+    case LogarithmicStep(min: Float, max: Float)
     
     /// Note that this is non transitive when values contains non unique elements
-    case Step(steps: [Double])
+    case Step(steps: [Float])
     
-    public func value(forPercentage percentage: Double) -> Double {
+    public func value(forPercentage percentage: Float) -> Float {
         switch self {
         case .Linear(let min, let max):
             return percentage.lerp(min: min, max: max)
         case .LinearStep(let min, let max):
             return round(percentage.lerp(min: min, max: max))
         case .Logarithmic(let min, let max):
-            return pow(percentage, Double(M_E)).lerp(min: min, max: max)
+            return pow(percentage, Float(M_E)).lerp(min: min, max: max)
         case .LogarithmicStep(let min, let max):
-            return round(pow(percentage, Double(M_E)).lerp(min: min, max: max))
+            return round(pow(percentage, Float(M_E)).lerp(min: min, max: max))
         case .Step(let steps):
-            let index = Int(round(percentage * Double(steps.count)))
+            let index = Int(round(percentage * Float(steps.count)))
             switch index {
             case (.min)..<0:
                 return steps.first!
@@ -293,19 +280,19 @@ public enum AudioKitControlScale {
         }
     }
     
-    public func percentage(forValue value: Double) -> Double {
+    public func percentage(forValue value: Float) -> Float {
         switch self {
         case .Linear(let min, let max):
             return value.ilerp(min: min, max: max)
         case .LinearStep(let min, let max):
             return round(value).ilerp(min: min, max: max)
         case .Logarithmic(let min, let max):
-            return pow(value.ilerp(min: min, max: max), 1.0 / Double(M_E))
+            return pow(value.ilerp(min: min, max: max), 1.0 / Float(M_E))
         case .LogarithmicStep(let min, let max):
-            return pow(round(value).ilerp(min: min, max: max), 1.0 / Double(M_E))
+            return pow(round(value).ilerp(min: min, max: max), 1.0 / Float(M_E))
         case .Step(let steps):
             if let index = steps.indexOf(value) {
-                return Double(index)
+                return Float(index)
             } else {
                 return 0.0
             }

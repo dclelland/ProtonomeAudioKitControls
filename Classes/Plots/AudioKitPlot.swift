@@ -8,6 +8,6 @@
 
 import UIKit
 
-@IBDesignable public class AudioKitPlot: AudioKitControl {
+@IBDesignable public class AudioKitPlot: ParameterControl {
     
 }
