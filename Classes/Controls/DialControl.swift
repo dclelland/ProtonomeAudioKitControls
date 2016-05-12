@@ -38,18 +38,6 @@ import SnapKit
         }
     }
     
-    @IBInspectable public var valueSuffix: String? {
-        didSet {
-            valueLabel.text = formattedValue
-        }
-    }
-    
-    @IBInspectable public var valuePrecision: Int = 0 {
-        didSet {
-            valueLabel.text = formattedValue
-        }
-    }
-    
     // MARK: - Views
     
     public lazy var valueLabel: UILabel = {

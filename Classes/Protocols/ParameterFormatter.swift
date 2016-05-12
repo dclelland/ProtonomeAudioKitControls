@@ -66,11 +66,15 @@ struct DurationParameterFormatter: ParameterFormatterConstructor {
         case 0.0:
             return NSNumberFormatter(digits: 1, suffix: "s")
         case 0.0..<0.00001:
-            return NSNumberFormatter(digits: 2, multiplier: 1000000.0, suffix: "µs", rounding: .SignificantDigits)
+            return NSNumberFormatter(digits: 1, multiplier: 1000000.0, suffix: "µs")
         case 0.00001..<0.0001:
+            return NSNumberFormatter(digits: 2, multiplier: 1000000.0, suffix: "µs", rounding: .SignificantDigits)
+        case 0.0001..<0.1:
             return NSNumberFormatter(digits: 2, multiplier: 1000.0, suffix: "ms", rounding: .SignificantDigits)
+        case 0.1..<10.0:
+            return NSNumberFormatter(digits: 2, suffix: "s", rounding: .SignificantDigits)
         default:
-            return NSNumberFormatter(digits: 2, suffix: "ms", rounding: .SignificantDigits)
+            return NSNumberFormatter(digits: 0, suffix: "s")
         }
     }
     
