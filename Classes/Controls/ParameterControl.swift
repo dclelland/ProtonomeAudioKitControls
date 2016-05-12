@@ -22,6 +22,111 @@ import SnapKit
         }
     }
     
+    // MARK: Value
+    
+    @IBInspectable public var value: Float = 0.0 {
+        didSet {
+            setNeedsDisplay()
+            sendActionsForControlEvents([.ValueChanged])
+        }
+    }
+    
+    // MARK: Scale
+    
+    var scale: ParameterScale {
+        switch ScaleType(rawValue: scaleType)! {
+        case .Linear:
+            return LinearParameterScale(minimum: scaleMin, maximum: scaleMax)
+        case .Logarithmic:
+            return LogarithmicParameterScale(minimum: scaleMin, maximum: scaleMax)
+        case .Integer:
+            return IntegerParameterScale(minimum: scaleMin, maximum: scaleMax)
+        case .Stepped:
+            return SteppedParameterScale(string: scaleSteps)
+        }
+    }
+    
+    public enum ScaleType: String {
+        case Linear = "linear"
+        case Logarithmic = "logarithmic"
+        case Integer = "integer"
+        case Stepped = "stepped"
+    }
+    
+    @IBInspectable public var scaleType: String = ScaleType.Linear.rawValue {
+        didSet {
+            setNeedsDisplay()
+        }
+    }
+    
+    @IBInspectable public var scaleMin: Float = 1.0 {
+        didSet {
+            setNeedsDisplay()
+        }
+    }
+    
+    @IBInspectable public var scaleMax: Float = 0.0 {
+        didSet {
+            setNeedsDisplay()
+        }
+    }
+    
+    @IBInspectable public var scaleSteps: String = "" {
+        didSet {
+            setNeedsDisplay()
+        }
+    }
+    
+    // MARK: Formatter
+    
+    var formatter: ParameterFormatter {
+        switch FormatterType(rawValue: formatterType)! {
+        case .Number:
+            return NumberParameterFormatter()
+        case .Integer:
+            return IntegerParameterFormatter()
+        case .Percentage:
+            return PercentageParameterFormatter()
+        case .Duration:
+            return DurationParameterFormatter()
+        case .Amplitude:
+            return AmplitudeParameterFormatter()
+        case .Frequency:
+            return FrequencyParameterFormatter()
+        case .Interval:
+            return IntervalParameterFormatter()
+        case .Stepped:
+            return SteppedParameterFormatter(steps: [])
+        }
+    }
+    
+    var formattedValue: String {
+        return formatter.string(forValue: value)
+    }
+    
+    public enum FormatterType: String {
+        case Number = "number"
+        case Integer = "integer"
+        case Percentage = "percentage"
+        case Duration = "duration"
+        case Amplitude = "amplitude"
+        case Frequency = "frequency"
+        case Interval = "interval"
+        case Stepped = "stepped"
+    }
+    
+    @IBInspectable public var formatterType: String = FormatterType.Number.rawValue {
+        didSet {
+            setNeedsDisplay()
+        }
+    }
+    
+    @IBInspectable public var formatterSteps: String = "" {
+        didSet {
+            setNeedsDisplay()
+        }
+    }
+    
     // MARK: Font
     
     var font: UIFont = UIFont.systemFontOfSize(12.0) {
@@ -45,68 +150,6 @@ import SnapKit
         }
         get {
             return font.pointSize
-        }
-    }
-    
-    // MARK: Value
-    
-    @IBInspectable public var value: Float = 0.0 {
-        didSet {
-            setNeedsDisplay()
-            sendActionsForControlEvents([.ValueChanged])
-        }
-    }
-    
-    @IBInspectable public var valueMin: Float = 0.0 {
-        didSet {
-            setNeedsDisplay()
-        }
-    }
-    
-    @IBInspectable public var valueMax: Float = 1.0 {
-        didSet {
-            setNeedsDisplay()
-        }
-    }
-    
-    @IBInspectable public var valueSteps: String? {
-        didSet {
-            setNeedsDisplay()
-        }
-    }
-    
-    // MARK: Scale
-    
-    var scale: AudioKitControlScale {
-        switch (scaleLogarithmic, scaleStep, scaleSteps) {
-        case (false, false, nil):
-            return .Linear(min: valueMin, max: valueMax)
-        case (false, true, nil):
-            return .LinearStep(min: valueMin, max: valueMax)
-        case (true, false, nil):
-            return .Logarithmic(min: valueMin, max: valueMax)
-        case (true, true, nil):
-            return .LogarithmicStep(min: valueMin, max: valueMax)
-        case (_, _, let steps):
-            return .Step(steps: steps!)
-        }
-    }
-    
-    private var scaleSteps: [Float]? {
-        // TODO: this
-        // separate valueSteps by whitespace and commas, convert to doubles, prune nils, return nil if empty array
-        return nil
-    }
-    
-    @IBInspectable public var scaleLogarithmic: Bool = false {
-        didSet {
-            setNeedsDisplay()
-        }
-    }
-    
-    @IBInspectable public var scaleStep: Bool = false {
-        didSet {
-            setNeedsDisplay()
         }
     }
     
@@ -184,7 +227,7 @@ import SnapKit
         touch = touches.first
         
         if let location = touch?.locationInView(self) {
-            value = scale.value(forPercentage: percentage(forLocation: location))
+            value = scale.value(forRatio: ratio(forLocation: location))
         }
         
         super.touchesBegan(touches, withEvent: event)
@@ -192,7 +235,7 @@ import SnapKit
     
     override public func touchesMoved(touches: Set<UITouch>, withEvent event: UIEvent?) {
         if let location = touch?.locationInView(self) {
-            value = scale.value(forPercentage: percentage(forLocation: location))
+            value = scale.value(forRatio: ratio(forLocation: location))
         }
         
         super.touchesMoved(touches, withEvent: event)
@@ -212,18 +255,18 @@ import SnapKit
     
     // MARK: - Overrideables
     
-    func percentage(forLocation location: CGPoint) -> Float {
+    func ratio(forLocation location: CGPoint) -> Float {
         return 0.0
     }
     
-    func path(forPercentage percentage: Float) -> UIBezierPath {
+    func path(forRatio ratio: Float) -> UIBezierPath {
         return UIBezierPath()
     }
     
     // MARK: Private getters
     
     private var hue: CGFloat {
-        return CGFloat(scale.percentage(forValue: value).lerp(min: 215.0, max: 0.0) / 360.0)
+        return CGFloat(scale.ratio(forValue: value).lerp(min: 215.0, max: 0.0) / 360.0)
     }
     
     private var backgroundPath: UIBezierPath {
@@ -239,65 +282,11 @@ import SnapKit
     }
     
     private var foregroundPath: UIBezierPath {
-        return path(forPercentage: scale.percentage(forValue: value))
+        return path(forRatio: scale.ratio(forValue: value))
     }
     
     private var foregroundPathColor: UIColor {
         return UIColor.protonome_lightColor(withHue: hue)
     }
 
-}
-
-// MARK: - Scale
-
-public enum AudioKitControlScale {
-    case Linear(min: Float, max: Float)
-    case LinearStep(min: Float, max: Float)
-    case Logarithmic(min: Float, max: Float)
-    case LogarithmicStep(min: Float, max: Float)
-    
-    /// Note that this is non transitive when values contains non unique elements
-    case Step(steps: [Float])
-    
-    public func value(forPercentage percentage: Float) -> Float {
-        switch self {
-        case .Linear(let min, let max):
-            return percentage.lerp(min: min, max: max)
-        case .LinearStep(let min, let max):
-            return round(percentage.lerp(min: min, max: max))
-        case .Logarithmic(let min, let max):
-            return pow(percentage, Float(M_E)).lerp(min: min, max: max)
-        case .LogarithmicStep(let min, let max):
-            return round(pow(percentage, Float(M_E)).lerp(min: min, max: max))
-        case .Step(let steps):
-            let index = Int(round(percentage * Float(steps.count)))
-            switch index {
-            case (.min)..<0:
-                return steps.first!
-            case 0..<steps.count:
-                return steps[index]
-            case steps.count...(.max):
-                return steps.last!
-            }
-        }
-    }
-    
-    public func percentage(forValue value: Float) -> Float {
-        switch self {
-        case .Linear(let min, let max):
-            return value.ilerp(min: min, max: max)
-        case .LinearStep(let min, let max):
-            return round(value).ilerp(min: min, max: max)
-        case .Logarithmic(let min, let max):
-            return pow(value.ilerp(min: min, max: max), 1.0 / Float(M_E))
-        case .LogarithmicStep(let min, let max):
-            return pow(round(value).ilerp(min: min, max: max), 1.0 / Float(M_E))
-        case .Step(let steps):
-            if let index = steps.indexOf(value) {
-                return Float(index)
-            } else {
-                return 0.0
-            }
-        }
-    }
 }

@@ -28,7 +28,7 @@ import SnapKit
     
     override public var value: Float {
         didSet {
-            valueLabel.text = valueText
+            valueLabel.text = formattedValue
         }
     }
     
@@ -40,13 +40,13 @@ import SnapKit
     
     @IBInspectable public var valueSuffix: String? {
         didSet {
-            valueLabel.text = valueText
+            valueLabel.text = formattedValue
         }
     }
     
     @IBInspectable public var valuePrecision: Int = 0 {
         didSet {
-            valueLabel.text = valueText
+            valueLabel.text = formattedValue
         }
     }
     
@@ -75,7 +75,7 @@ import SnapKit
     
     // MARK: - Overrideables
     
-    override func percentage(forLocation location: CGPoint) -> Float {
+    override func ratio(forLocation location: CGPoint) -> Float {
         let center = valueLabel.center
         let radius = dialRadius * Float(min(valueLabel.frame.height, valueLabel.frame.width))
         
@@ -83,23 +83,23 @@ import SnapKit
         let angle = Float(atan2(location.y - center.y, location.x - center.x))
         
         guard radius < distance else {
-            return scale.percentage(forValue: value)
+            return scale.ratio(forValue: value)
         }
         
         let scaledAngle = fmod(angle + 270°, 360°)
         
         guard (minimumDeadZone...maximumDeadZone).contains(scaledAngle) else {
-            return scale.percentage(forValue: value)
+            return scale.ratio(forValue: value)
         }
         
         return scaledAngle.ilerp(min: minimumAngle, max: maximumAngle).clamp(min: 0.0, max: 1.0)
     }
     
-    override func path(forPercentage percentage: Float) -> UIBezierPath {
+    override func path(forRatio ratio: Float) -> UIBezierPath {
         let center = valueLabel.center
         
         let radius = CGFloat(dialRadius) * min(valueLabel.frame.height, valueLabel.frame.width)
-        let angle = CGFloat(percentage.lerp(min: minimumAngle, max: maximumAngle) + 90°)
+        let angle = CGFloat(ratio.lerp(min: minimumAngle, max: maximumAngle) + 90°)
         
         let pointerA = pol2rec(r: radius * 0.75, θ: angle - 45°)
         let pointerB = pol2rec(r: radius * 1.25, θ: angle)
@@ -112,22 +112,6 @@ import SnapKit
             make.line(x: center.x + pointerC.x, y: center.y + pointerC.y)
             make.close()
         }
-    }
-    
-    // MARK: - Private getters
-    
-    private var valueText: String? {
-        let numberFormatter = NSNumberFormatter()
-        
-        numberFormatter.numberStyle = .DecimalStyle
-        numberFormatter.positiveSuffix = valueSuffix ?? ""
-        numberFormatter.negativeSuffix = valueSuffix ?? ""
-        numberFormatter.minimumFractionDigits = valuePrecision
-        numberFormatter.maximumFractionDigits = valuePrecision
-        
-        /* Needs check for negative zero values */
-        
-        return numberFormatter.stringFromNumber(value == -0 ? 0 : value)
     }
     
 }
