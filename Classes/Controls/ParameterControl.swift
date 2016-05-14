@@ -18,7 +18,7 @@ import SnapKit
     
     @IBInspectable public var title: String = "" {
         didSet {
-            titleLabel.text = title
+            setNeedsLayout()
         }
     }
     
@@ -26,6 +26,7 @@ import SnapKit
     
     @IBInspectable public var value: Float = 0.0 {
         didSet {
+            setNeedsLayout()
             setNeedsDisplay()
             sendActionsForControlEvents([.ValueChanged])
         }
@@ -59,25 +60,25 @@ import SnapKit
     
     @IBInspectable public var scaleType: String = ScaleType.Linear.rawValue {
         didSet {
-            setNeedsDisplay()
+            setNeedsLayout()
         }
     }
     
     @IBInspectable public var scaleMin: Float = 1.0 {
         didSet {
-            setNeedsDisplay()
+            setNeedsLayout()
         }
     }
     
     @IBInspectable public var scaleMax: Float = 0.0 {
         didSet {
-            setNeedsDisplay()
+            setNeedsLayout()
         }
     }
     
     @IBInspectable public var scaleSteps: String = "" {
         didSet {
-            setNeedsDisplay()
+            setNeedsLayout()
         }
     }
     
@@ -126,13 +127,13 @@ import SnapKit
     
     @IBInspectable public var formatterType: String = FormatterType.Number.rawValue {
         didSet {
-            setNeedsDisplay()
+            setNeedsLayout()
         }
     }
     
     @IBInspectable public var formatterSteps: String = "" {
         didSet {
-            setNeedsDisplay()
+            setNeedsLayout()
         }
     }
     
@@ -144,7 +145,7 @@ import SnapKit
     
     var font: UIFont = UIFont.systemFontOfSize(12.0) {
         didSet {
-            titleLabel.font = font
+            setNeedsLayout()
         }
     }
     
@@ -170,7 +171,7 @@ import SnapKit
     
     @IBInspectable public var cornerRadius: CGFloat = 0.0 {
         didSet {
-            setNeedsDisplay()
+            setNeedsLayout()
         }
     }
     
@@ -187,13 +188,13 @@ import SnapKit
     
     override public var selected: Bool {
         didSet {
-            setNeedsDisplay()
+            setNeedsLayout()
         }
     }
     
     override public var highlighted: Bool {
         didSet {
-            setNeedsDisplay()
+            setNeedsLayout()
         }
     }
     
@@ -201,6 +202,13 @@ import SnapKit
         super.prepareForInterfaceBuilder()
         
         setNeedsUpdateConstraints()
+    }
+    
+    override public func layoutSubviews() {
+        super.layoutSubviews()
+        
+        titleLabel.text = title
+        titleLabel.font = font
     }
     
     override public func updateConstraints() {

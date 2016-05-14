@@ -24,20 +24,6 @@ import SnapKit
     private let minimumDeadZone: Float = 2°
     private let maximumDeadZone: Float = 358°
     
-    // MARK: - Properties
-    
-    override public var value: Float {
-        didSet {
-            valueLabel.text = formatter.string(forValue: value)
-        }
-    }
-    
-    override public var font: UIFont {
-        didSet {
-            valueLabel.font = font
-        }
-    }
-    
     // MARK: - Views
     
     public lazy var valueLabel: UILabel = {
@@ -48,6 +34,13 @@ import SnapKit
     }()
     
     // MARK: - Overrides
+    
+    override public func layoutSubviews() {
+        super.layoutSubviews()
+        
+        valueLabel.text = formatter.string(forValue: value)
+        valueLabel.font = font
+    }
     
     override public func updateConstraints() {
         super.updateConstraints()

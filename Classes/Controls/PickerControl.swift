@@ -15,22 +15,18 @@ import UIKit
     @IBInspectable public var gridColumns: UInt = 0 {
         didSet {
             setNeedsLayout()
-            setNeedsDisplay()
         }
     }
     
     @IBInspectable public var gridRows: UInt = 0 {
         didSet {
             setNeedsLayout()
-            setNeedsDisplay()
         }
     }
     
     @IBInspectable public var gutter: CGFloat = 2.0 {
         didSet {
-            setNeedsUpdateConstraints()
             setNeedsLayout()
-            setNeedsDisplay()
         }
     }
     
