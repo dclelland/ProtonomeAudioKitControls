@@ -46,7 +46,7 @@ import SnapKit
         case .Integer:
             return IntegerParameterScale(minimum: scaleMin, maximum: scaleMax)
         case .Stepped:
-            return SteppedParameterScale(string: scaleSteps)
+            return SteppedParameterScale(values: scaleValues)
         }
     }
     
@@ -81,6 +81,10 @@ import SnapKit
         }
     }
     
+    private var scaleValues: [Float] {
+        return scaleSteps.characters.split(",").map { Float(String($0))! }
+    }
+    
     // MARK: Formatter
     
     var formatter: ParameterFormatter {
@@ -104,7 +108,8 @@ import SnapKit
         case .Interval:
             return IntervalParameterFormatter()
         case .Stepped:
-            return SteppedParameterFormatter(steps: [])
+            let steps = NSDictionary.init(objects: formatterValues, forKeys: scaleValues) as! [Float: String]
+            return SteppedParameterFormatter(steps: steps)
         }
     }
     
@@ -133,6 +138,10 @@ import SnapKit
         didSet {
             setNeedsDisplay()
         }
+    }
+    
+    private var formatterValues: [String] {
+        return formatterSteps.characters.split(",").map { String($0) }
     }
     
     // MARK: Font

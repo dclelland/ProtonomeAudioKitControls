@@ -120,10 +120,10 @@ struct IntervalParameterFormatter: ParameterFormatterConstructor {
 
 struct SteppedParameterFormatter: ParameterFormatter {
     
-    var steps: [(String, Float)]
+    var steps: [Float: String]
     
     func string(forValue value: Float) -> String {
-        return "TEST"
+        return steps[value]!
     }
 
 }
