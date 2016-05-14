@@ -256,11 +256,11 @@ import SnapKit
     // MARK: - Overrideables
     
     func ratio(forLocation location: CGPoint) -> Float {
-        return 0.0
+        fatalError("Subclasses of ParameterControl must override ratio(forLocation:)")
     }
     
     func path(forRatio ratio: Float) -> UIBezierPath {
-        return UIBezierPath()
+        fatalError("Subclasses of ParameterControl must override path(forRatio:)")
     }
     
     // MARK: Private getters

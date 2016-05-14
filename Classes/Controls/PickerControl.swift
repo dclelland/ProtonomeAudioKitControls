@@ -10,4 +10,14 @@ import UIKit
 
 @IBDesignable public class PickerControl: ParameterControl {
     
+//    // MARK: - Overrideables
+//    
+//    override func ratio(forLocation location: CGPoint) -> Float {
+//        
+//    }
+//    
+//    override func path(forRatio ratio: Float) -> UIBezierPath {
+//        
+//    }
+    
 }
