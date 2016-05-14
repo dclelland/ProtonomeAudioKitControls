@@ -16,7 +16,7 @@ import SnapKit
     
     // MARK: Title
     
-    @IBInspectable public var title: String? {
+    @IBInspectable public var title: String = "" {
         didSet {
             titleLabel.text = title
         }
@@ -34,7 +34,11 @@ import SnapKit
     // MARK: Scale
     
     var scale: ParameterScale {
-        switch ScaleType(rawValue: scaleType)! {
+        guard let type = ScaleType(rawValue: scaleType) else {
+            fatalError("Invalid scale type \"\(scaleType)\" in control with title \"\(title)\"")
+        }
+        
+        switch type {
         case .Linear:
             return LinearParameterScale(minimum: scaleMin, maximum: scaleMax)
         case .Logarithmic:
@@ -80,7 +84,11 @@ import SnapKit
     // MARK: Formatter
     
     var formatter: ParameterFormatter {
-        switch FormatterType(rawValue: formatterType)! {
+        guard let type = FormatterType(rawValue: formatterType) else {
+            fatalError("Invalid formatter type \"\(formatterType)\" in control with title \"\(title)\"")
+        }
+        
+        switch type {
         case .Number:
             return NumberParameterFormatter()
         case .Integer:
