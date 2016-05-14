@@ -67,23 +67,31 @@ struct SteppedParameterScale: ParameterScale {
     var values: [Float]
     
     func value(forRatio ratio: Float) -> Float {
-        let index = Int(round(ratio * Float(values.count)))
-        switch index {
-        case (.min)..<0:
-            return values.first!
-        case 0..<values.count:
-            return values[index]
-        default:
-            return values.last!
-        }
+        return value(forIndex: index(forRatio: ratio))
     }
     
     func ratio(forValue value: Float) -> Float {
-        if let index = values.indexOf(value) {
-            return Float(index)
-        } else {
-            return 0.0
-        }
+        return ratio(forIndex: index(forValue: value))
+    }
+    
+    // MARK: Ratio to index to value
+    
+    private func index(forRatio ratio: Float) -> Int {
+        return Int(round(ratio * Float(values.count - 1)))
+    }
+    
+    private func value(forIndex index: Int) -> Float {
+        return values[index]
+    }
+    
+    // MARK: Value to index to ratio
+    
+    private func index(forValue value: Float) -> Int {
+        return values.indexOf(value)!
+    }
+    
+    private func ratio(forIndex index: Int) -> Float {
+        return Float(index) / Float(values.count - 1)
     }
     
 }

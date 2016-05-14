@@ -15,7 +15,7 @@ import Lerp
     
     override public var value: Float {
         didSet {
-            valueLabel.text = formattedValue
+            valueLabel.text = formatter.string(forValue: value)
         }
     }
     

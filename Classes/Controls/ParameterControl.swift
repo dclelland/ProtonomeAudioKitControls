@@ -113,10 +113,6 @@ import SnapKit
         }
     }
     
-    var formattedValue: String {
-        return formatter.string(forValue: value)
-    }
-    
     public enum FormatterType: String {
         case Number = "number"
         case Integer = "integer"
