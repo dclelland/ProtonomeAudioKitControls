@@ -50,18 +50,27 @@ import Lerp
     
     // MARK: - Overrideables
     
-    private var internalPosition: CGPoint = CGPoint.zero
+    private var exitRatio: CGFloat = 0.0
     
     override func ratio(forLocation location: CGPoint) -> Float {
-        // this could far more easily be done with pattern matching...
-        if (bounds.contains(location)) {
-            internalPosition = location
-            let ratio = location.y.ilerp(min: bounds.maxY, max: bounds.minY)
-            return Float(ratio).clamp(min: 0.0, max: 1.0)
-        } else {
-            let scale = max(bounds.minX - location.x, 0.0) + max(location.x - bounds.maxX, 0.0)
-            let offset = internalPosition.y.ilerp(min: bounds.maxY, max: bounds.minY)
-            let ratio = location.y.ilerp(min: bounds.maxY + scale * offset, max: bounds.minY - scale * (1.0 - offset))
+        switch location.x {
+        case (-.max)..<bounds.minX:
+            let scale = bounds.minX - location.x
+            let min = bounds.maxY + scale * exitRatio
+            let max = bounds.minY - scale * (1.0 - exitRatio)
+            let ratio = location.y.ilerp(min: min, max: max).clamp(min: 0.0, max: 1.0)
+            return Float(ratio)
+        case bounds.minX...bounds.maxX:
+            let min = bounds.maxY
+            let max = bounds.minY
+            let ratio = location.y.ilerp(min: min, max: max).clamp(min: 0.0, max: 1.0)
+            exitRatio = ratio
+            return Float(ratio)
+        default:
+            let scale = location.x - bounds.maxX
+            let min = bounds.maxY + scale * exitRatio
+            let max = bounds.minY - scale * (1.0 - exitRatio)
+            let ratio = location.y.ilerp(min: min, max: max)
             return Float(ratio).clamp(min: 0.0, max: 1.0)
         }
     }
