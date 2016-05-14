@@ -12,17 +12,47 @@ import UIKit
     
     // MARK: - Properties
     
-    @IBInspectable public var columns: UInt = 0 {
+    @IBInspectable public var gridColumns: UInt = 0 {
         didSet {
             setNeedsLayout()
             setNeedsDisplay()
         }
     }
     
-    @IBInspectable public var rows: UInt = 0 {
+    @IBInspectable public var gridRows: UInt = 0 {
         didSet {
             setNeedsLayout()
             setNeedsDisplay()
+        }
+    }
+    
+    @IBInspectable public var gutter: CGFloat = 2.0 {
+        didSet {
+            setNeedsUpdateConstraints()
+            setNeedsLayout()
+            setNeedsDisplay()
+        }
+    }
+    
+    // MARK: - Views
+    
+    private lazy var containerView: UIView = {
+        let view = UIView()
+        view.userInteractionEnabled = false
+        return view
+    }()
+    
+    // MARK: - Overrides
+    
+    override public func updateConstraints() {
+        super.updateConstraints()
+        
+        addSubview(containerView)
+        containerView.snp_updateConstraints { make in
+            make.top.equalTo(self)
+            make.left.equalTo(self)
+            make.right.equalTo(self)
+            make.bottom.equalTo(titleLabel.snp_top).offset(-gutter)
         }
     }
     

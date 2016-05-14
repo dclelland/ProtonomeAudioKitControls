@@ -73,7 +73,7 @@ struct SteppedParameterScale: ParameterScale {
             return values.first!
         case 0..<values.count:
             return values[index]
-        case values.count...(.max):
+        default:
             return values.last!
         }
     }
