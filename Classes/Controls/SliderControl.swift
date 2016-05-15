@@ -9,7 +9,7 @@
 import UIKit
 import Lerp
 
-@IBDesignable public class SliderControl: ParameterControl {
+@IBDesignable public class SliderControl: AudioControl {
     
     // MARK: - Views
     

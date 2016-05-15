@@ -12,7 +12,7 @@ import Degrad
 import Lerp
 import SnapKit
 
-@IBDesignable public class DialControl: ParameterControl {
+@IBDesignable public class DialControl: AudioControl {
     
     // MARK: - Constants
     

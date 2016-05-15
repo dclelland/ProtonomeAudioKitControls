@@ -1,5 +1,5 @@
 //
-//  ParameterControl.swift
+//  AudioControl.swift
 //  ProtonomeAudioKitControls
 //
 //  Created by Daniel Clelland on 5/12/15.
@@ -10,7 +10,7 @@ import UIKit
 import Lerp
 import SnapKit
 
-@IBDesignable public class ParameterControl: UIControl {
+@IBDesignable public class AudioControl: UIControl {
     
     // MARK: - Properties
     

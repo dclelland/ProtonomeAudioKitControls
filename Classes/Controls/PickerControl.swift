@@ -8,7 +8,7 @@
 
 import UIKit
 
-@IBDesignable public class PickerControl: ParameterControl {
+@IBDesignable public class PickerControl: AudioControl {
     
     // MARK: - Properties
     
