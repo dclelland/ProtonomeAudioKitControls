@@ -13,11 +13,29 @@ import AudioKit
     
     // MARK: - Parameters
     
+    // MARK: State
+    
+    @IBInspectable override public var selected: Bool {
+        didSet {
+            setNeedsDisplay()
+        }
+    }
+    
+    @IBInspectable override public var highlighted: Bool {
+        didSet {
+            setNeedsDisplay()
+        }
+    }
+    
+    // MARK: Scale
+    
     @IBInspectable public var plotScale: CGFloat = 1.0 {
         didSet {
             setNeedsDisplay()
         }
     }
+    
+    // MARK: Color
     
     @IBInspectable public var colorHue: CGFloat = 0.0 {
         didSet {
@@ -31,11 +49,20 @@ import AudioKit
         }
     }
     
+    // MARK: Corner radius
+    
+    @IBInspectable public var cornerRadius: CGFloat = 0.0 {
+        didSet {
+            setNeedsLayout()
+        }
+    }
+    
     // MARK: - Private vars
     
     private var csound: CsoundObj?
     
     private var data = NSData()
+    
     private var samples = [Float]() {
         didSet {
             setNeedsDisplay()
@@ -49,18 +76,6 @@ import AudioKit
     }
     
     // MARK: - Overrides
-    
-    @IBInspectable override public var selected: Bool {
-        didSet {
-            setNeedsDisplay()
-        }
-    }
-    
-    @IBInspectable override public var highlighted: Bool {
-        didSet {
-            setNeedsDisplay()
-        }
-    }
     
     override public func prepareForInterfaceBuilder() {
         super.prepareForInterfaceBuilder()
@@ -100,7 +115,7 @@ import AudioKit
     // MARK: - Private getters
     
     private var backgroundPath: UIBezierPath {
-        return UIBezierPath(roundedRect: bounds, cornerRadius: layer.cornerRadius)
+        return UIBezierPath(roundedRect: bounds, cornerRadius: cornerRadius)
     }
     
     private var foregroundPath: UIBezierPath {
