@@ -11,7 +11,7 @@ Pod::Spec.new do |s|
   s.homepage                = "https://github.com/dclelland/ProtonomeAudioKitControls"
   s.license                 = { :type => 'MIT' }
   s.author                  = { "Daniel Clelland" => "daniel.clelland@gmail.com" }
-  s.source                  = { :git => "https://github.com/dclelland/Bezzy.git", :tag => "0.2.0" }
+  s.source                  = { :git => "https://github.com/dclelland/ProtonomeAudioKitControls.git", :tag => "0.2.0" }
   s.platform                = :ios, '8.0'
   s.ios.deployment_target   = '8.0'
   s.ios.source_files        = 'Classes/**/*.swift'
