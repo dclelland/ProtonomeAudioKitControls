@@ -204,6 +204,15 @@ import SnapKit
         setNeedsUpdateConstraints()
     }
     
+    override public func awakeFromNib() {
+        super.awakeFromNib()
+        
+        addTarget(self, action: #selector(didChangeValue), forControlEvents: .ValueChanged)
+        addTarget(self, action: #selector(didTouchDown), forControlEvents: .TouchDown)
+        addTarget(self, action: #selector(didTouchUp), forControlEvents: .TouchUpInside)
+        addTarget(self, action: #selector(didTouchUp), forControlEvents: .TouchUpOutside)
+    }
+    
     override public func layoutSubviews() {
         super.layoutSubviews()
         
@@ -234,6 +243,26 @@ import SnapKit
         
         CGContextSetFillColorWithColor(context, foregroundPathColor.CGColor)
         foregroundPath.fill()
+    }
+    
+    // MARK: - Actions
+    
+    public var onChangeValue: ((value: Float) -> Void)?
+    
+    internal func didChangeValue() {
+        onChangeValue?(value: value)
+    }
+    
+    public var onTouchDown: (Void -> Void)?
+    
+    internal func didTouchDown() {
+        onTouchDown?()
+    }
+    
+    public var onTouchUp: (Void -> Void)?
+    
+    internal func didTouchUp() {
+        onTouchUp?()
     }
     
     // MARK: - Touches
@@ -284,7 +313,7 @@ import SnapKit
         fatalError("Subclasses of ParameterControl must override path(forRatio:)")
     }
     
-    // MARK: Private getters
+    // MARK: - Private getters
     
     private var hue: CGFloat {
         return CGFloat(scale.ratio(forValue: value).lerp(min: 215.0, max: 0.0) / 360.0)
