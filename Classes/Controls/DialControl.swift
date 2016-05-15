@@ -12,9 +12,11 @@ import Degrad
 import Lerp
 import SnapKit
 
+/// IBDesignable `AudioControl` subclass which draws a dial, which can be used to select a value radially, using the touch point's angle relative to the dial's center.
+/// This way, the user can exert arbitrarily precise control over the dial, depending upon how far away their touch is from the dial.
 @IBDesignable public class DialControl: AudioControl {
     
-    // MARK: - Constants
+    // MARK: - Private constants
     
     private let dialRadius: Float = 0.375
     
@@ -26,6 +28,9 @@ import SnapKit
     
     // MARK: - Views
     
+    /// The control's value label. Displays the contents of `value`, as processed by the control's `formatter` object.
+    /// The constraints created for this label respect the layout margins, so they may be used to customise the padding around the value label.
+    /// The dial indicator is drawn centered on this label.
     public lazy var valueLabel: UILabel = {
         let label = UILabel()
         label.textAlignment = .Center
@@ -56,7 +61,15 @@ import SnapKit
     
     // MARK: - Overrideables
     
-    override func ratio(forLocation location: CGPoint) -> Float {
+    /**
+     A method used to convert the current touch location into a useful ratio, in range `0.0...1.0`.
+     If the touch is inside the dial's indicator, or if it falls inside the 4° dead zone at the base of the dial, it returns the current value. Otherwise, it takes the angle of the touch location relative to the center of the dial indicator, and calculates a ratio from that.
+     
+     - parameter location: The touch location.
+     
+     - returns: A ratio, in range `0.0...1.0`.
+     */
+    override public func ratio(forLocation location: CGPoint) -> Float {
         let center = valueLabel.center
         let radius = dialRadius * Float(min(valueLabel.frame.height, valueLabel.frame.width))
         
@@ -76,7 +89,15 @@ import SnapKit
         return scaledAngle.ilerp(min: minimumAngle, max: maximumAngle).clamp(min: 0.0, max: 1.0)
     }
     
-    override func path(forRatio ratio: Float) -> UIBezierPath {
+    /**
+     A method used to convert a ratio, in range `0.0...1.0`, into a bezier path used for the dial control's indicator.
+     This instance returns a circular path with additional indicator notch.
+     
+     - parameter ratio: A ratio, in range `0.0...1.0`.
+     
+     - returns: A bezier path used for the dial control's indicator.
+     */
+    override public func path(forRatio ratio: Float) -> UIBezierPath {
         let center = valueLabel.center
         
         let radius = CGFloat(dialRadius) * min(valueLabel.frame.height, valueLabel.frame.width)

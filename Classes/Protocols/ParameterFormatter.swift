@@ -8,29 +8,34 @@
 
 import UIKit
 
-protocol ParameterFormatter {
+/// A protocol which describes a conversion from a value to a formatted string.
+public protocol ParameterFormatter {
     
+    /// Converts a value to a formatted string.
     func string(forValue value: Float) -> String
     
 }
 
-protocol ParameterFormatterConstructor: ParameterFormatter {
+/// A protocol which describes the construction of an `NSNumberFormatter`, which may be used by `ParameterFormatterConstructor`'s default implementation to implement the `ParameterFormatter` protocol.
+public protocol ParameterFormatterConstructor: ParameterFormatter {
     
+    /// Constructs an NSNumberFormatter for a given value.
     func formatter(forValue value: Float) -> NSNumberFormatter
     
 }
 
 extension ParameterFormatterConstructor {
     
-    func string(forValue value: Float) -> String {
+    public func string(forValue value: Float) -> String {
         return formatter(forValue: value).stringFromNumber(NSNumber(float: value))!
     }
     
 }
 
-struct NumberParameterFormatter: ParameterFormatterConstructor {
+/// A parameter formatter class which formats numbers, e.g.: `"1.2"`.
+public struct NumberParameterFormatter: ParameterFormatterConstructor {
     
-    func formatter(forValue value: Float) -> NSNumberFormatter {
+    public func formatter(forValue value: Float) -> NSNumberFormatter {
         switch fabs(value) {
         case 0.0..<0.01:
             return NSNumberFormatter(digits: 1)
@@ -43,25 +48,28 @@ struct NumberParameterFormatter: ParameterFormatterConstructor {
     
 }
 
-struct IntegerParameterFormatter: ParameterFormatterConstructor {
+/// A parameter formatter class which formats integers, e.g.: `"6"`.
+public struct IntegerParameterFormatter: ParameterFormatterConstructor {
     
-    func formatter(forValue value: Float) -> NSNumberFormatter {
+    public func formatter(forValue value: Float) -> NSNumberFormatter {
         return NSNumberFormatter(digits: 0)
     }
     
 }
 
-struct PercentageParameterFormatter: ParameterFormatterConstructor {
+/// A parameter formatter class which formats percentages, e.g.: `"50%"` for the value `7.5`.
+public struct PercentageParameterFormatter: ParameterFormatterConstructor {
     
-    func formatter(forValue value: Float) -> NSNumberFormatter {
+    public func formatter(forValue value: Float) -> NSNumberFormatter {
         return NSNumberFormatter(digits: 0, multiplier: 100.0, suffix: "%")
     }
     
 }
 
-struct DurationParameterFormatter: ParameterFormatterConstructor {
+/// A parameter formatter class which formats durations, e.g.: `"40ms"` for the value `0.04`.
+public struct DurationParameterFormatter: ParameterFormatterConstructor {
     
-    func formatter(forValue value: Float) -> NSNumberFormatter {
+    public func formatter(forValue value: Float) -> NSNumberFormatter {
         switch fabs(value) {
         case 0.0:
             return NSNumberFormatter(digits: 1, suffix: "s")
@@ -80,9 +88,10 @@ struct DurationParameterFormatter: ParameterFormatterConstructor {
     
 }
 
-struct AmplitudeParameterFormatter: ParameterFormatterConstructor {
+/// A parameter formatter class which formats amplitudes, e.g.: `"6.0dB"`.
+public struct AmplitudeParameterFormatter: ParameterFormatterConstructor {
     
-    func formatter(forValue value: Float) -> NSNumberFormatter {
+    public func formatter(forValue value: Float) -> NSNumberFormatter {
         switch fabs(value) {
         case 0.0..<10.0:
             return NSNumberFormatter(digits: 1, suffix: "dB")
@@ -93,9 +102,10 @@ struct AmplitudeParameterFormatter: ParameterFormatterConstructor {
     
 }
 
-struct FrequencyParameterFormatter: ParameterFormatterConstructor {
+/// A parameter formatter class which formats frequencies, e.g.: `"4.0kHz"` for the value `4000`.
+public struct FrequencyParameterFormatter: ParameterFormatterConstructor {
     
-    func formatter(forValue value: Float) -> NSNumberFormatter {
+    public func formatter(forValue value: Float) -> NSNumberFormatter {
         switch (fabs(value)) {
         case 0.0..<1.0:
             return NSNumberFormatter(digits: 1, suffix: "Hz")
@@ -110,20 +120,18 @@ struct FrequencyParameterFormatter: ParameterFormatterConstructor {
     
 }
 
-struct IntervalParameterFormatter: ParameterFormatterConstructor {
+/// A parameter formatter class which picks a name from a stepped sequence, e.g. if `steps` is `[1: "A", 2: "B"]`, then the value `2` is formatted `"B"`.
+///
+/// Invalid values will return an empty string, in the interest of type safety but at the disregard of sensible behaviour (we'd rather return `""` than crash in the event some process causes an invalid value to be sent here at run time).
+///
+/// Values must also be unique, in the interest of transitivity.
+public struct SteppedParameterFormatter: ParameterFormatter {
     
-    func formatter(forValue value: Float) -> NSNumberFormatter {
-        return NSNumberFormatter(digits: 1, suffix: "c")
-    }
+    /// The formatter's steps - a dictionary of unique values to names.
+    public var steps: [Float: String]
     
-}
-
-struct SteppedParameterFormatter: ParameterFormatter {
-    
-    var steps: [Float: String]
-    
-    func string(forValue value: Float) -> String {
-        return steps[value]!
+    public func string(forValue value: Float) -> String {
+        return steps[value] ?? ""
     }
 
 }

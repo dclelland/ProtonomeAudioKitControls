@@ -9,6 +9,7 @@
 import UIKit
 import AudioKit
 
+/// IBDesignable `UIControl` subclass which draws the current CSound buffer as a waveform in `drawRect:`.
 @IBDesignable public class AudioPlot: UIControl {
     
     // MARK: - Parameters
@@ -29,6 +30,7 @@ import AudioKit
     
     // MARK: Scale
     
+    /// The factor by which the waveform is scaled vertically. Defaults to 1.0.
     @IBInspectable public var plotScale: CGFloat = 1.0 {
         didSet {
             setNeedsDisplay()
@@ -37,12 +39,14 @@ import AudioKit
     
     // MARK: Color
     
+    /// The hue used to draw the background and waveform. Defaults to 0.0.
     @IBInspectable public var colorHue: CGFloat = 0.0 {
         didSet {
             setNeedsDisplay()
         }
     }
     
+    /// The saturation used to draw the background and waveform. Defaults to 0.0.
     @IBInspectable public var colorSaturation: CGFloat = 1.0 {
         didSet {
             setNeedsDisplay()
@@ -51,6 +55,7 @@ import AudioKit
     
     // MARK: Corner radius
     
+    /// The control's corner radius. The radius given to the rounded rect created in `drawRect:`.
     @IBInspectable public var cornerRadius: CGFloat = 0.0 {
         didSet {
             setNeedsLayout()
@@ -161,7 +166,7 @@ import AudioKit
         case (_, true):
             return UIColor.protonome_darkColor(withHue: colorHue, saturation: colorSaturation)
         default:
-            return UIColor.protonome_darkGreyColor()
+            return UIColor.protonome_darkGrayColor()
         }
     }
     

@@ -8,22 +8,26 @@
 
 import UIKit
 
+/// IBDesignable `AudioControl` subclass which draws a picker, which can be used to select a value from a grid of values.
 @IBDesignable public class PickerControl: AudioControl {
     
     // MARK: - Properties
     
+    /// The number of columns shown in the picker.
     @IBInspectable public var gridColumns: UInt = 0 {
         didSet {
             setNeedsLayout()
         }
     }
     
+    /// The number of rows shown in the picker.
     @IBInspectable public var gridRows: UInt = 0 {
         didSet {
             setNeedsLayout()
         }
     }
     
+    /// The spacing between cells shown in the picker.
     @IBInspectable public var gutter: CGFloat = 2.0 {
         didSet {
             setNeedsLayout()
@@ -64,7 +68,15 @@ import UIKit
     
     // MARK: - Overrideables
     
-    override func ratio(forLocation location: CGPoint) -> Float {
+    /**
+     A method used to convert the current touch location into a useful ratio, in range `0.0...1.0`.
+     This finds the current cell index underneath the touch point, ensuring that if the touch falls outside the view's bounds, a sensible cell index is selected. The integer cell index in range `0..<gridCells` is then converted to the ratio range `0.0...1.0`.
+     
+     - parameter location: The touch location.
+     
+     - returns: A ratio, in range `0.0...1.0`.
+     */
+    override public func ratio(forLocation location: CGPoint) -> Float {
         let rect = containerView.frame
         
         let column = floor((Float(location.x.ilerp(min: rect.minX, max: rect.maxX)) * Float(gridColumns)).clamp(min: 0.0, max: Float(gridColumns - 1)))
@@ -75,7 +87,15 @@ import UIKit
         return ratio(forIndex: index)
     }
     
-    override func path(forRatio ratio: Float) -> UIBezierPath {
+    /**
+     A method used to convert a ratio, in range `0.0...1.0`, into a bezier path used for the picker control's indicator.
+     This instance returns a rounded rect corresponding to the currently selected cell.
+     
+     - parameter ratio: A ratio, in range `0.0...1.0`.
+     
+     - returns: A bezier path used for the dial control's indicator.
+     */
+    override public func path(forRatio ratio: Float) -> UIBezierPath {
         let index = self.index(forRatio: ratio)
         return UIBezierPath.init(roundedRect: cell(forIndex: index), cornerRadius: cornerRadius)
     }

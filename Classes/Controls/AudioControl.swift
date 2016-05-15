@@ -10,12 +10,15 @@ import UIKit
 import Lerp
 import SnapKit
 
+/// IBDesignable `UIControl` subclass which can be used as a base class for creating dials, pickers, sliders etc.
+/// Subclasses must override `ratio(forLocation:)` and `path(forRatio:)`
 @IBDesignable public class AudioControl: UIControl {
     
     // MARK: - Properties
     
     // MARK: Title
     
+    /// The control's title text, as displayed in the titleLabel.
     @IBInspectable public var title: String = "" {
         didSet {
             setNeedsLayout()
@@ -24,6 +27,7 @@ import SnapKit
     
     // MARK: Value
     
+    /// The control's current value. Changing this triggers a new layout and display, and fires a `.ValueChanged` control event.
     @IBInspectable public var value: Float = 0.0 {
         didSet {
             setNeedsLayout()
@@ -34,6 +38,9 @@ import SnapKit
     
     // MARK: Scale
     
+    /// The control's scale object, used for converting a generic ratio with range `0.0...1.0` (e.g. a slider's progress) to a useful value.
+    /// The scale object is dynamically generated, and depends upon `scaleType`, plus either `scaleMin` and `scaleMax`, or `scaleSteps` if `scaleType` is `"stepped"`.
+    /// Invalid values for `scaleType` will fire a fatal error.
     var scale: ParameterScale {
         guard let type = ScaleType(rawValue: scaleType) else {
             fatalError("Invalid scale type \"\(scaleType)\" in control with title \"\(title)\"")
@@ -51,31 +58,47 @@ import SnapKit
         }
     }
     
+    /// Default options for `scaleType`.
     public enum ScaleType: String {
+        
+        /// Specifies a `LinearParameterScale` object.
         case Linear = "linear"
+        
+        /// Specifies a `LogarithmicParameterScale` object.
         case Logarithmic = "logarithmic"
+        
+        /// Specifies an `IntegerParameterScale` object.
         case Integer = "integer"
+        
+        /// Specifies a `SteppedParameterScale` object.
         case Stepped = "stepped"
     }
     
+    /// A string constant specifying the chosen scale.
+    /// Due to the limitations of `@IBInspectable`, this must be set to one of the constants `"linear"`, `"logarithmic"`, `"integer"`, or `"stepped"`.
     @IBInspectable public var scaleType: String = ScaleType.Linear.rawValue {
         didSet {
             setNeedsLayout()
         }
     }
     
+    /// A minimum value, used by the linear, logarithmic, or integer scales.
     @IBInspectable public var scaleMin: Float = 1.0 {
         didSet {
             setNeedsLayout()
         }
     }
     
+    /// A maximum value, used by the linear, logarithmic, or integer scales.
     @IBInspectable public var scaleMax: Float = 0.0 {
         didSet {
             setNeedsLayout()
         }
     }
     
+    /// A sequence of steps, used by the stepped scale.
+    /// Due to the limitations of `@IBInspectable`, this must be a comma-separated sequence of numbers, e.g.: "1.2,5.0,2.6,4.5".
+    /// Invalid values will fire an exception.
     @IBInspectable public var scaleSteps: String = "" {
         didSet {
             setNeedsLayout()
@@ -88,6 +111,9 @@ import SnapKit
     
     // MARK: Formatter
     
+    /// The control's formatter object, used for converting a generic value with arbitrary range to a user-readable string.
+    /// The formatter object is dynamically generated, and depends upon `formatterSteps`, if `formatterType` is `"stepped"`.
+    /// Invalid values for `formatterType` will fire a fatal error.
     var formatter: ParameterFormatter {
         guard let type = FormatterType(rawValue: formatterType) else {
             fatalError("Invalid formatter type \"\(formatterType)\" in control with title \"\(title)\"")
@@ -106,31 +132,48 @@ import SnapKit
             return AmplitudeParameterFormatter()
         case .Frequency:
             return FrequencyParameterFormatter()
-        case .Interval:
-            return IntervalParameterFormatter()
         case .Stepped:
             let steps = NSDictionary.init(objects: formatterValues, forKeys: scaleValues) as! [Float: String]
             return SteppedParameterFormatter(steps: steps)
         }
     }
     
+    /// Default options for `formatterType`.
     public enum FormatterType: String {
+        
+        /// Specifies a `NumberParameterFormatter` object.
         case Number = "number"
+        
+        /// Specifies an `IntegerParameterFormatter` object.
         case Integer = "integer"
+        
+        /// Specifies a `PercentageParameterFormatter` object.
         case Percentage = "percentage"
+        
+        /// Specifies a `DurationParameterFormatter` object.
         case Duration = "duration"
+        
+        /// Specifies an `AmplitudeParameterFormatter` object.
         case Amplitude = "amplitude"
+        
+        /// Specifies a `FrequencyParameterFormatter` object.
         case Frequency = "frequency"
-        case Interval = "interval"
+        
+        /// Specifies a `SteppedParameterFormatter` object.
         case Stepped = "stepped"
     }
     
+    /// A string constant specifying the chosen formatter.
+    /// Due to the limitations of `@IBInspectable`, this must be set to one of the constants `"number"`, `"integer"`, `"percentage"`, `"duration"`, `"amplitude"`, `"frequency"`, or `"stepped"`.
     @IBInspectable public var formatterType: String = FormatterType.Number.rawValue {
         didSet {
             setNeedsLayout()
         }
     }
     
+    /// A sequence of steps, used by the stepped formatter.
+    /// Due to the limitations of `@IBInspectable`, this must be a comma-separated sequence of strings, e.g.: "Triangle,Square,Sawtooth".
+    /// Invalid values will fire an exception.
     @IBInspectable public var formatterSteps: String = "" {
         didSet {
             setNeedsLayout()
@@ -143,12 +186,14 @@ import SnapKit
     
     // MARK: Font
     
+    /// The control's font, used by the title label. Setting `fontName` or `fontSize` will update this value.
     var font: UIFont = UIFont.systemFontOfSize(12.0) {
         didSet {
             setNeedsLayout()
         }
     }
     
+    /// The control's font name, used by the title label. This is split from `fontSize` as `@IBInspectable` does not support `UIFont` values.
     @IBInspectable public var fontName: String {
         set {
             font = UIFont(name: newValue, size: fontSize) ?? UIFont.systemFontOfSize(fontSize)
@@ -158,6 +203,7 @@ import SnapKit
         }
     }
     
+    /// The control's font size, used by the title label. This is split from `fontName` as `@IBInspectable` does not support `UIFont` values.
     @IBInspectable public var fontSize: CGFloat {
         set {
             font = UIFont(name: fontName, size: newValue) ?? UIFont.systemFontOfSize(newValue)
@@ -169,6 +215,7 @@ import SnapKit
     
     // MARK: Corner radius
     
+    /// The control's corner radius. The radius given to the rounded rect created in `drawRect:`.
     @IBInspectable public var cornerRadius: CGFloat = 0.0 {
         didSet {
             setNeedsLayout()
@@ -177,6 +224,8 @@ import SnapKit
     
     // MARK: - Views
     
+    /// The control's title label. Displays the contents of `title`.
+    /// The constraints created for this label respect the layout margins, so they may be used to customise the padding around the title label.
     public lazy var titleLabel: UILabel = {
         let label = UILabel()
         label.textAlignment = .Center
@@ -247,18 +296,21 @@ import SnapKit
     
     // MARK: - Actions
     
+    /// A callback block, called when a `.ValueChanged` control event fires, i.e. when `value` is set.
     public var onChangeValue: ((value: Float) -> Void)?
     
     internal func didChangeValue() {
         onChangeValue?(value: value)
     }
     
+    /// A callback block, called when a `.TouchDown` control event fires, i.e. when the control is selected.
     public var onTouchDown: (Void -> Void)?
     
     internal func didTouchDown() {
         onTouchDown?()
     }
     
+    /// A callback block, called when a `.TouchUpInside` or `.TouchUpOutside` control event fires, i.e. when the control is de-selected.
     public var onTouchUp: (Void -> Void)?
     
     internal func didTouchUp() {
@@ -305,11 +357,26 @@ import SnapKit
     
     // MARK: - Overrideables
     
-    func ratio(forLocation location: CGPoint) -> Float {
+    /**
+     A method used to convert the current touch location into a useful ratio, in range `0.0...1.0`.
+     Subclasses must override this method or a fatal error will fire.
+     
+     - parameter location: The touch location.
+     
+     - returns: A ratio, in range `0.0...1.0`.
+     */
+    public func ratio(forLocation location: CGPoint) -> Float {
         fatalError("Subclasses of ParameterControl must override ratio(forLocation:)")
     }
     
-    func path(forRatio ratio: Float) -> UIBezierPath {
+    /**
+     A method used to convert a ratio, in range `0.0...1.0`, into a bezier path used for the control's foreground, i.e. the indicator on a dial control.
+     
+     - parameter ratio: A ratio, in range `0.0...1.0`.
+     
+     - returns: A bezier path used for the control's foreground.
+     */
+    public func path(forRatio ratio: Float) -> UIBezierPath {
         fatalError("Subclasses of ParameterControl must override path(forRatio:)")
     }
     
