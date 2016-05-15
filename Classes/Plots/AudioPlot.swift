@@ -11,16 +11,27 @@ import AudioKit
 
 @IBDesignable public class AudioPlot: UIControl {
     
-    public enum Mode {
-        case Normal
-        case Highlighted
-        case Selected
+    // MARK: - Parameters
+    
+    @IBInspectable public var plotScale: CGFloat = 1.0 {
+        didSet {
+            setNeedsDisplay()
+        }
     }
     
-    public var mode: Mode = .Normal
+    @IBInspectable public var colorHue: CGFloat = 0.0 {
+        didSet {
+            setNeedsDisplay()
+        }
+    }
     
-    public var hue: CGFloat = 0.0
-    public var saturation: CGFloat = 0.0
+    @IBInspectable public var colorSaturation: CGFloat = 1.0 {
+        didSet {
+            setNeedsDisplay()
+        }
+    }
+    
+    // MARK: - Private vars
     
     private var csound: CsoundObj?
     
@@ -31,22 +42,36 @@ import AudioKit
         }
     }
     
+    // MARK: - Initialization
+    
     deinit {
         AKManager.removeBinding(self)
     }
     
     // MARK: - Overrides
     
-    override public var selected: Bool {
+    @IBInspectable override public var selected: Bool {
         didSet {
             setNeedsDisplay()
         }
     }
     
-    override public var highlighted: Bool {
+    @IBInspectable override public var highlighted: Bool {
         didSet {
             setNeedsDisplay()
         }
+    }
+    
+    override public func prepareForInterfaceBuilder() {
+        super.prepareForInterfaceBuilder()
+        
+        var testSamples = [Float](count: 512, repeatedValue: 0.0)
+        
+        for index in testSamples.indices {
+            testSamples[index] = sin(Float(index / 2) / 256.0 * Float(M_PI * 2.0))
+        }
+        
+        samples = testSamples
     }
     
     override public func didMoveToSuperview() {
@@ -88,7 +113,7 @@ import AudioKit
             let safeSample = sample.isNaN ? 0.0 : sample
             
             let x = CGFloat(i) * (bounds.width / CGFloat(length - 1))
-            let y = (safeSample + 0.5) * bounds.height
+            let y = safeSample.lerp(min: 0.5, max: 0.5 + plotScale * 0.5) * bounds.height
             
             if (i == 0) {
                 CGPathMoveToPoint(path, nil, x, y)
@@ -102,7 +127,7 @@ import AudioKit
             let safeSample = sample.isNaN ? 0.0 : sample
             
             let x = CGFloat(i) * (bounds.width / CGFloat(length - 1))
-            let y = (-safeSample + 0.5) * bounds.height
+            let y = safeSample.lerp(min: 0.5, max: 0.5 - plotScale * 0.5) * bounds.height
             
             CGPathAddLineToPoint(path, nil, x, y)
         }
@@ -115,18 +140,18 @@ import AudioKit
     }
     
     private var backgroundPathColor: UIColor {
-        switch mode {
-        case .Normal:
+        switch (highlighted, selected) {
+        case (true, _):
+            return UIColor.protonome_mediumColor(withHue: colorHue, saturation: colorSaturation)
+        case (_, true):
+            return UIColor.protonome_darkColor(withHue: colorHue, saturation: colorSaturation)
+        default:
             return UIColor.protonome_darkGreyColor()
-        case .Highlighted:
-            return UIColor.protonome_mediumColor(withHue: hue, saturation: saturation)
-        case .Selected:
-            return UIColor.protonome_darkColor(withHue: hue, saturation: saturation)
         }
     }
     
     private var foregroundPathColor: UIColor {
-        return UIColor.protonome_lightColor(withHue: hue, saturation: saturation)
+        return UIColor.protonome_lightColor(withHue: colorHue, saturation: colorSaturation)
     }
     
 }
@@ -144,7 +169,7 @@ extension AudioPlot: CsoundBinding {
         
         data = csound.getOutSamples()
         
-        var samples = [Float](count: data.length / sizeof(Float), repeatedValue: 0)
+        var samples = [Float](count: data.length / sizeof(Float), repeatedValue: 0.0)
         
         data.getBytes(&samples, length:data.length)
         
