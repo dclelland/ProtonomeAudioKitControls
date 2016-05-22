@@ -82,7 +82,7 @@ import UIKit
         let column = floor((Float(location.x.ilerp(min: rect.minX, max: rect.maxX)) * Float(gridColumns)).clamp(min: 0.0, max: Float(gridColumns - 1)))
         let row = floor((Float(location.y.ilerp(min: rect.minY, max: rect.maxY)) * Float(gridRows)).clamp(min: 0.0, max: Float(gridRows - 1)))
         
-        let index = UInt((Float(row) * Float(gridColumns) + column).clamp(min: 0.0, max: Float(gridCells - 1)))
+        let index = UInt((row * Float(gridColumns) + column).clamp(min: 0.0, max: Float(gridCells - 1)))
         
         return ratio(forIndex: index)
     }
