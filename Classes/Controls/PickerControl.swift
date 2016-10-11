@@ -9,7 +9,7 @@
 import UIKit
 
 /// IBDesignable `AudioControl` subclass which draws a picker, which can be used to select a value from a grid of values.
-@IBDesignable public class PickerControl: AudioControl {
+@IBDesignable open class PickerControl: AudioControl {
     
     // MARK: - Properties
     
@@ -38,31 +38,31 @@ import UIKit
     
     private lazy var containerView: UIView = {
         let view = UIView()
-        view.userInteractionEnabled = false
+        view.isUserInteractionEnabled = false
         return view
     }()
     
     // MARK: - Overrides
     
-    override public func layoutSubviews() {
+    override open func layoutSubviews() {
         super.layoutSubviews()
         
         containerView.subviews.forEach { $0.removeFromSuperview() }
         
         for index in 0..<gridCells {
-            containerView.addSubview(valueLabel(forIndex: index))
+            containerView.addSubview(valueLabel(for: index))
         }
     }
     
-    override public func updateConstraints() {
+    override open func updateConstraints() {
         super.updateConstraints()
         
         addSubview(containerView)
-        containerView.snp_updateConstraints { make in
+        containerView.snp.updateConstraints { make in
             make.top.equalTo(self)
             make.left.equalTo(self)
             make.right.equalTo(self)
-            make.bottom.equalTo(titleLabel.snp_top).offset(-gutter)
+            make.bottom.equalTo(titleLabel.snp.top).offset(-gutter)
         }
     }
     
@@ -76,7 +76,7 @@ import UIKit
      
      - returns: A ratio, in range `0.0...1.0`.
      */
-    override public func ratio(forLocation location: CGPoint) -> Float {
+    override open func ratio(for location: CGPoint) -> Float {
         let location = location.ilerp(rect: containerView.frame)
         
         let column = floor((Float(location.x) * Float(gridColumns)).clamp(min: 0.0, max: Float(gridColumns - 1)))
@@ -84,7 +84,7 @@ import UIKit
         
         let index = UInt((Float(row) * Float(gridColumns) + column).clamp(min: 0.0, max: Float(gridCells - 1)))
         
-        return ratio(forIndex: index)
+        return ratio(for: index)
     }
     
     /**
@@ -95,9 +95,9 @@ import UIKit
      
      - returns: A bezier path used for the dial control's indicator.
      */
-    override public func path(forRatio ratio: Float) -> UIBezierPath {
-        let index = self.index(forRatio: ratio)
-        return UIBezierPath.init(roundedRect: cell(forIndex: index), cornerRadius: cornerRadius)
+    override open func path(for ratio: Float) -> UIBezierPath {
+        let index = self.index(for: ratio)
+        return UIBezierPath.init(roundedRect: cell(for: index), cornerRadius: cornerRadius)
     }
     
     // MARK: - Private getters
@@ -110,29 +110,29 @@ import UIKit
         return gridColumns * gridRows
     }
     
-    private func index(forRatio ratio: Float) -> UInt {
+    private func index(for ratio: Float) -> UInt {
         return UInt(round(ratio * Float(gridCells - 1)))
     }
     
-    private func ratio(forIndex index: UInt) -> Float {
+    private func ratio(for index: UInt) -> Float {
         return Float(index) / Float(gridCells - 1)
     }
     
-    private func valueLabel(forIndex index: UInt) -> UILabel {
-        let label = UILabel(frame: cell(forIndex: index))
-        label.text = formatter.string(forValue: scale.value(forRatio: ratio(forIndex: index)))
+    private func valueLabel(for index: UInt) -> UILabel {
+        let label = UILabel(frame: cell(for: index))
+        label.text = formatter.string(for: scale.value(for: ratio(for: index)))
         label.font = font
-        label.textAlignment = .Center
+        label.textAlignment = .center
         label.textColor = UIColor.protonome_blackColor()
         label.adjustsFontSizeToFitWidth = true
         return label
     }
     
-    private func cell(forIndex index: UInt) -> CGRect {
+    private func cell(for index: UInt) -> CGRect {
         let x = Int(index % gridColumns)
         let y = Int(index / gridColumns)
         
-        return containerView.bounds.cell(atX: x, y: y, columns: gridColumns, rows: gridRows, gutter: gutter)
+        return containerView.bounds.cellAt(x: x, y: y, columns: gridColumns, rows: gridRows, gutter: gutter)
     }
     
 }
@@ -141,8 +141,8 @@ import UIKit
 
 private extension CGRect {
     
-    func cell(atX x: Int, y: Int, columns: UInt, rows: UInt, gutter: CGFloat = 0.0) -> CGRect {
-        let scale = UIScreen.mainScreen().scale
+    func cellAt(x: Int, y: Int, columns: UInt, rows: UInt, gutter: CGFloat = 0.0) -> CGRect {
+        let scale = UIScreen.main.scale
         
         let cellWidth = (width + gutter) / CGFloat(columns)
         let cellHeight = (height + gutter) / CGFloat(rows)
@@ -153,7 +153,7 @@ private extension CGRect {
         let rightEdge = round((cellWidth * CGFloat(x + 1) - gutter + minX) * scale) / scale
         let bottomEdge = round((cellHeight * CGFloat(y + 1) - gutter + minY) * scale) / scale
         
-        return CGRectMake(leftEdge, topEdge, rightEdge - leftEdge, bottomEdge - topEdge)
+        return CGRect(x: leftEdge, y: topEdge, width: rightEdge - leftEdge, height: bottomEdge - topEdge)
     }
     
 }

@@ -14,7 +14,7 @@ import SnapKit
 
 /// IBDesignable `AudioControl` subclass which draws a dial, which can be used to select a value radially, using the touch point's angle relative to the dial's center.
 /// This way, the user can exert arbitrarily precise control over the dial, depending upon how far away their touch is from the dial.
-@IBDesignable public class DialControl: AudioControl {
+@IBDesignable open class DialControl: AudioControl {
     
     // MARK: - Private constants
     
@@ -33,7 +33,7 @@ import SnapKit
     /// The dial indicator is drawn centered on this label.
     public lazy var valueLabel: UILabel = {
         let label = UILabel()
-        label.textAlignment = .Center
+        label.textAlignment = .center
         label.textColor = UIColor.protonome_blackColor()
         label.adjustsFontSizeToFitWidth = true
         return label
@@ -41,22 +41,22 @@ import SnapKit
     
     // MARK: - Overrides
     
-    override public func layoutSubviews() {
+    override open func layoutSubviews() {
         super.layoutSubviews()
         
-        valueLabel.text = formatter.string(forValue: value)
+        valueLabel.text = formatter.string(for: value)
         valueLabel.font = font
     }
     
-    override public func updateConstraints() {
+    override open func updateConstraints() {
         super.updateConstraints()
         
         addSubview(valueLabel)
-        valueLabel.snp_updateConstraints { make in
-            make.top.equalTo(self.snp_topMargin)
-            make.left.equalTo(self.snp_leftMargin)
-            make.right.equalTo(self.snp_rightMargin)
-            make.bottom.equalTo(titleLabel.snp_top)
+        valueLabel.snp.updateConstraints { make in
+            make.top.equalTo(snp.topMargin)
+            make.left.equalTo(snp.leftMargin)
+            make.right.equalTo(snp.rightMargin)
+            make.bottom.equalTo(titleLabel.snp.top)
         }
     }
     
@@ -70,7 +70,7 @@ import SnapKit
      
      - returns: A ratio, in range `0.0...1.0`.
      */
-    override public func ratio(forLocation location: CGPoint) -> Float {
+    override open func ratio(for location: CGPoint) -> Float {
         let center = valueLabel.center
         let radius = dialRadius * Float(min(valueLabel.frame.height, valueLabel.frame.width))
         
@@ -78,13 +78,13 @@ import SnapKit
         let angle = Float(atan2(location.y - center.y, location.x - center.x))
         
         guard radius < distance else {
-            return scale.ratio(forValue: value)
+            return scale.ratio(for: value)
         }
         
         let scaledAngle = fmod(angle + 270°, 360°)
         
         guard (minimumDeadZone...maximumDeadZone).contains(scaledAngle) else {
-            return scale.ratio(forValue: value)
+            return scale.ratio(for: value)
         }
         
         return scaledAngle.ilerp(min: minimumAngle, max: maximumAngle).clamp(min: 0.0, max: 1.0)
@@ -98,7 +98,7 @@ import SnapKit
      
      - returns: A bezier path used for the dial control's indicator.
      */
-    override public func path(forRatio ratio: Float) -> UIBezierPath {
+    override open func path(for ratio: Float) -> UIBezierPath {
         let center = valueLabel.center
         
         let radius = CGFloat(dialRadius) * min(valueLabel.frame.height, valueLabel.frame.width)

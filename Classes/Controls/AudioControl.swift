@@ -12,7 +12,7 @@ import SnapKit
 
 /// IBDesignable `UIControl` subclass which can be used as a base class for creating dials, pickers, sliders etc.
 /// Subclasses must override `ratio(forLocation:)` and `path(forRatio:)`
-@IBDesignable public class AudioControl: UIControl {
+@IBDesignable open class AudioControl: UIControl {
     
     // MARK: - Properties
     
@@ -32,7 +32,7 @@ import SnapKit
         didSet {
             setNeedsLayout()
             setNeedsDisplay()
-            sendActionsForControlEvents([.ValueChanged])
+            sendActions(for: [.valueChanged])
         }
     }
     
@@ -118,7 +118,7 @@ import SnapKit
     }
     
     private var scaleValues: [Float] {
-        return scaleSteps.characters.split(",").map { Float(String($0))! }
+        return scaleSteps.characters.split(separator: ",").map { Float(String($0))! }
     }
     
     // MARK: Formatter
@@ -126,7 +126,7 @@ import SnapKit
     /// The control's formatter object, used for converting a generic value with arbitrary range to a user-readable string.
     /// The formatter object is dynamically generated, and depends upon `formatterString`, if `formatterType` is `"string"`, or `formatterSteps`, if `formatterType` is `"stepped"`.
     /// Invalid values for `formatterType` will fire a fatal error.
-    var formatter: ParameterFormatter {
+    internal var formatter: ParameterFormatter {
         guard let type = FormatterType(rawValue: formatterType) else {
             fatalError("Invalid formatter type \"\(formatterType)\" in control with title \"\(title)\"")
         }
@@ -147,7 +147,7 @@ import SnapKit
         case .String:
             return StringParameterFormatter(string: formatterString)
         case .Stepped:
-            let steps = NSDictionary.init(objects: formatterValues, forKeys: scaleValues) as! [Float: String]
+            let steps = NSDictionary(objects: formatterValues, forKeys: scaleValues as [NSCopying]) as! [Float: String]
             return SteppedParameterFormatter(steps: steps)
         }
     }
@@ -205,13 +205,13 @@ import SnapKit
     }
     
     private var formatterValues: [String] {
-        return formatterSteps.characters.split(",").map { String($0) }
+        return formatterSteps.characters.split(separator: ",").map { String($0) }
     }
     
     // MARK: Font
     
     /// The control's font, used by the title label. Setting `fontName` or `fontSize` will update this value.
-    var font: UIFont = UIFont.systemFontOfSize(12.0) {
+    internal var font: UIFont = .systemFont(ofSize: 12.0) {
         didSet {
             setNeedsLayout()
         }
@@ -220,7 +220,7 @@ import SnapKit
     /// The control's font name, used by the title label. This is split from `fontSize` as `@IBInspectable` does not support `UIFont` values.
     @IBInspectable public var fontName: String {
         set {
-            font = UIFont(name: newValue, size: fontSize) ?? UIFont.systemFontOfSize(fontSize)
+            font = UIFont(name: newValue, size: fontSize) ?? .systemFont(ofSize: fontSize)
         }
         get {
             return font.fontName
@@ -230,7 +230,7 @@ import SnapKit
     /// The control's font size, used by the title label. This is split from `fontName` as `@IBInspectable` does not support `UIFont` values.
     @IBInspectable public var fontSize: CGFloat {
         set {
-            font = UIFont(name: fontName, size: newValue) ?? UIFont.systemFontOfSize(newValue)
+            font = UIFont(name: fontName, size: newValue) ?? .systemFont(ofSize: newValue)
         }
         get {
             return font.pointSize
@@ -252,7 +252,7 @@ import SnapKit
     /// The constraints created for this label respect the layout margins, so they may be used to customise the padding around the title label.
     public lazy var titleLabel: UILabel = {
         let label = UILabel()
-        label.textAlignment = .Center
+        label.textAlignment = .center
         label.textColor = UIColor.protonome_blackColor()
         label.adjustsFontSizeToFitWidth = true
         return label
@@ -272,83 +272,85 @@ import SnapKit
     
     // MARK: - Overrides
     
-    override public var selected: Bool {
+    override open var isSelected: Bool {
         didSet {
             setNeedsLayout()
         }
     }
     
-    override public var highlighted: Bool {
+    override open var isHighlighted: Bool {
         didSet {
             setNeedsLayout()
         }
     }
     
-    override public func prepareForInterfaceBuilder() {
+    override open func prepareForInterfaceBuilder() {
         super.prepareForInterfaceBuilder()
         
         setNeedsUpdateConstraints()
     }
     
-    override public func layoutSubviews() {
+    override open func layoutSubviews() {
         super.layoutSubviews()
         
         titleLabel.text = title
         titleLabel.font = font
     }
     
-    override public func updateConstraints() {
+    override open func updateConstraints() {
         super.updateConstraints()
         
         addSubview(titleLabel)
-        titleLabel.setContentHuggingPriority(UILayoutPriorityRequired, forAxis: .Vertical)
-        titleLabel.snp_updateConstraints { make in
-            make.left.equalTo(self.snp_leftMargin)
-            make.right.equalTo(self.snp_rightMargin)
-            make.bottom.equalTo(self.snp_bottomMargin)
+        titleLabel.setContentHuggingPriority(UILayoutPriorityRequired, for: .vertical)
+        titleLabel.snp.updateConstraints { make in
+            make.left.equalTo(snp.leftMargin)
+            make.right.equalTo(snp.rightMargin)
+            make.bottom.equalTo(snp.bottomMargin)
         }
     }
     
-    public override func drawRect(rect: CGRect) {
-        let context = UIGraphicsGetCurrentContext()
+    open override func draw(_ rect: CGRect) {
+        guard let context = UIGraphicsGetCurrentContext() else {
+            return
+        }
         
-        CGContextClearRect(context, rect)
+        context.clear(rect)
         
-        CGContextSetFillColorWithColor(context, backgroundPathColor.CGColor)
+        context.setFillColor(backgroundPathColor.cgColor)
         backgroundPath.fill()
         backgroundPath.addClip()
         
-        CGContextSetFillColorWithColor(context, foregroundPathColor.CGColor)
+        context.setFillColor(foregroundPathColor.cgColor)
         foregroundPath.fill()
     }
     
     // MARK: - Actions
     
     private func setupActions() {
-        addTarget(self, action: #selector(didChangeValue), forControlEvents: .ValueChanged)
-        addTarget(self, action: #selector(didTouchDown), forControlEvents: .TouchDown)
-        addTarget(self, action: #selector(didTouchUp), forControlEvents: .TouchUpInside)
-        addTarget(self, action: #selector(didTouchUp), forControlEvents: .TouchUpOutside)
+        addTarget(self, action: #selector(valueChanged), for: .valueChanged)
+        addTarget(self, action: #selector(touchDown), for: .touchDown)
+        addTarget(self, action: #selector(touchUp), for: .touchUpInside)
+        addTarget(self, action: #selector(touchUp), for: .touchUpOutside)
     }
     
     /// A callback block, called when a `.ValueChanged` control event fires, i.e. when `value` is set.
-    public var onChangeValue: ((value: Float) -> Void)?
+    public var onChangeValue: ((_ value: Float) -> Void)?
     
-    internal func didChangeValue() {
-        onChangeValue?(value: value)
+    internal func valueChanged() {
+        onChangeValue?(value)
     }
     
     /// A callback block, called when a `.TouchDown` control event fires, i.e. when the control is selected.
-    public var onTouchDown: (Void -> Void)?
+    public var onTouchDown: ((Void) -> Void)?
     
-    internal func didTouchDown() {
+    internal func touchDown() {
         onTouchDown?()
     }
     
     /// A callback block, called when a `.TouchUpInside` or `.TouchUpOutside` control event fires, i.e. when the control is de-selected.
-    public var onTouchUp: (Void -> Void)?
+    public var onTouchUp: ((Void) -> Void)?
     
-    internal func didTouchUp() {
+    internal func touchUp() {
         onTouchUp?()
     }
     
@@ -356,38 +358,38 @@ import SnapKit
     
     private var touch: UITouch? {
         didSet {
-            selected = touch != nil
+            isSelected = touch != nil
         }
     }
     
-    override public func touchesBegan(touches: Set<UITouch>, withEvent event: UIEvent?) {
+    override open func touchesBegan(_ touches: Set<UITouch>, with event: UIEvent?) {
         touch = touches.first
         
-        if let location = touch?.locationInView(self) {
-            value = scale.value(forRatio: ratio(forLocation: location))
+        if let location = touch?.location(in: self) {
+            value = scale.value(for: ratio(for: location))
         }
         
-        super.touchesBegan(touches, withEvent: event)
+        super.touchesBegan(touches, with: event)
     }
     
-    override public func touchesMoved(touches: Set<UITouch>, withEvent event: UIEvent?) {
-        if let location = touch?.locationInView(self) {
-            value = scale.value(forRatio: ratio(forLocation: location))
+    override open func touchesMoved(_ touches: Set<UITouch>, with event: UIEvent?) {
+        if let location = touch?.location(in: self) {
+            value = scale.value(for: ratio(for: location))
         }
         
-        super.touchesMoved(touches, withEvent: event)
+        super.touchesMoved(touches, with: event)
     }
     
-    override public func touchesCancelled(touches: Set<UITouch>?, withEvent event: UIEvent?) {
+    override open func touchesCancelled(_ touches: Set<UITouch>, with event: UIEvent?) {
         touch = nil
         
-        super.touchesCancelled(touches, withEvent: event)
+        super.touchesCancelled(touches, with: event)
     }
     
-    override public func touchesEnded(touches: Set<UITouch>, withEvent event: UIEvent?) {
+    override open func touchesEnded(_ touches: Set<UITouch>, with event: UIEvent?) {
         touch = nil
         
-        super.touchesEnded(touches, withEvent: event)
+        super.touchesEnded(touches, with: event)
     }
     
     // MARK: - Overrideables
@@ -400,7 +402,7 @@ import SnapKit
      
      - returns: A ratio, in range `0.0...1.0`.
      */
-    public func ratio(forLocation location: CGPoint) -> Float {
+    open func ratio(for location: CGPoint) -> Float {
         fatalError("Subclasses of ParameterControl must override ratio(forLocation:)")
     }
     
@@ -411,14 +413,14 @@ import SnapKit
      
      - returns: A bezier path used for the control's foreground.
      */
-    public func path(forRatio ratio: Float) -> UIBezierPath {
+    open func path(for ratio: Float) -> UIBezierPath {
         fatalError("Subclasses of ParameterControl must override path(forRatio:)")
     }
     
     // MARK: - Private getters
     
     private var hue: CGFloat {
-        return CGFloat(scale.ratio(forValue: value).lerp(min: 215.0, max: 0.0) / 360.0)
+        return CGFloat(scale.ratio(for: value).lerp(min: 215.0, max: 0.0) / 360.0)
     }
     
     private var backgroundPath: UIBezierPath {
@@ -426,7 +428,7 @@ import SnapKit
     }
     
     private var backgroundPathColor: UIColor {
-        if (highlighted || selected) {
+        if (isHighlighted || isSelected) {
             return UIColor.protonome_mediumColor(withHue: hue)
         } else {
             return UIColor.protonome_darkColor(withHue: hue)
@@ -434,7 +436,7 @@ import SnapKit
     }
     
     private var foregroundPath: UIBezierPath {
-        return path(forRatio: scale.ratio(forValue: value))
+        return path(for: scale.ratio(for: value))
     }
     
     private var foregroundPathColor: UIColor {

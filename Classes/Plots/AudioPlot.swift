@@ -10,19 +10,19 @@ import UIKit
 import AudioKit
 
 /// IBDesignable `UIControl` subclass which draws the current CSound buffer as a waveform in `drawRect:`.
-@IBDesignable public class AudioPlot: UIControl {
+@IBDesignable open class AudioPlot: UIControl {
     
     // MARK: - Parameters
     
     // MARK: State
     
-    @IBInspectable override public var selected: Bool {
+    @IBInspectable override open var isSelected: Bool {
         didSet {
             setNeedsDisplay()
         }
     }
     
-    @IBInspectable override public var highlighted: Bool {
+    @IBInspectable override open var isHighlighted: Bool {
         didSet {
             setNeedsDisplay()
         }
@@ -31,7 +31,7 @@ import AudioKit
     // MARK: Scale
     
     /// The factor by which the waveform is scaled vertically. Defaults to 1.0.
-    @IBInspectable public var plotScale: CGFloat = 1.0 {
+    @IBInspectable open var plotScale: CGFloat = 1.0 {
         didSet {
             setNeedsDisplay()
         }
@@ -40,14 +40,14 @@ import AudioKit
     // MARK: Color
     
     /// The hue used to draw the background and waveform. Defaults to 0.0.
-    @IBInspectable public var colorHue: CGFloat = 0.0 {
+    @IBInspectable open var colorHue: CGFloat = 0.0 {
         didSet {
             setNeedsDisplay()
         }
     }
     
     /// The saturation used to draw the background and waveform. Defaults to 0.0.
-    @IBInspectable public var colorSaturation: CGFloat = 1.0 {
+    @IBInspectable open var colorSaturation: CGFloat = 1.0 {
         didSet {
             setNeedsDisplay()
         }
@@ -56,7 +56,7 @@ import AudioKit
     // MARK: Corner radius
     
     /// The control's corner radius. The radius given to the rounded rect created in `drawRect:`.
-    @IBInspectable public var cornerRadius: CGFloat = 0.0 {
+    @IBInspectable open var cornerRadius: CGFloat = 0.0 {
         didSet {
             setNeedsLayout()
         }
@@ -64,11 +64,11 @@ import AudioKit
     
     // MARK: - Private vars
     
-    private var csound: CsoundObj?
+    fileprivate var csound: CsoundObj?
     
-    private var data = NSData()
+    fileprivate var data = Data()
     
-    private var samples = [Float]() {
+    fileprivate var samples = [Float]() {
         didSet {
             setNeedsDisplay()
         }
@@ -82,10 +82,10 @@ import AudioKit
     
     // MARK: - Overrides
     
-    override public func prepareForInterfaceBuilder() {
+    override open func prepareForInterfaceBuilder() {
         super.prepareForInterfaceBuilder()
         
-        var testSamples = [Float](count: 512, repeatedValue: 0.0)
+        var testSamples = [Float](repeating: 0.0, count: 512)
         
         for index in testSamples.indices {
             testSamples[index] = sin(Float(index / 2) / 256.0 * Float(M_PI * 2.0))
@@ -94,7 +94,7 @@ import AudioKit
         samples = testSamples
     }
     
-    override public func didMoveToSuperview() {
+    override open func didMoveToSuperview() {
         super.didMoveToSuperview()
         
         if (superview == nil) {
@@ -104,16 +104,18 @@ import AudioKit
         }
     }
     
-    override public func drawRect(rect: CGRect) {
-        let context = UIGraphicsGetCurrentContext()
+    override open func draw(_ rect: CGRect) {
+        guard let context = UIGraphicsGetCurrentContext() else {
+            return
+        }
         
-        CGContextClearRect(context, rect)
+        context.clear(rect)
         
-        CGContextSetFillColorWithColor(context, backgroundPathColor.CGColor)
+        context.setFillColor(backgroundPathColor.cgColor)
         backgroundPath.fill()
         backgroundPath.addClip()
         
-        CGContextSetFillColorWithColor(context, foregroundPathColor.CGColor)
+        context.setFillColor(foregroundPathColor.cgColor)
         foregroundPath.fill()
     }
     
@@ -124,7 +126,7 @@ import AudioKit
     }
     
     private var foregroundPath: UIBezierPath {
-        let path = CGPathCreateMutable()
+        let path = CGMutablePath()
         
         let length = samples.count / 2
         
@@ -138,13 +140,13 @@ import AudioKit
             let location = CGPoint(x: x, y: y).lerp(rect: bounds)
             
             if (i == 0) {
-                CGPathMoveToPoint(path, nil, location.x, location.y)
+                path.move(to: location)
             } else {
-                CGPathAddLineToPoint(path, nil, location.x, location.y)
+                path.addLine(to: location)
             }
         }
         
-        for i in (0..<length).reverse() {
+        for i in (0..<length).reversed() {
             let sample = CGFloat(samples[i * 2 + 1])
             let safeSample = sample.isNaN ? 0.0 : sample
             
@@ -153,18 +155,18 @@ import AudioKit
             
             let location = CGPoint(x: x, y: y).lerp(rect: bounds)
             
-            CGPathAddLineToPoint(path, nil, location.x, location.y)
+            path.addLine(to: location)
         }
         
         if length > 0 {
-            CGPathCloseSubpath(path)
+            path.closeSubpath()
         }
         
-        return UIBezierPath(CGPath: path)
+        return UIBezierPath(cgPath: path)
     }
     
     private var backgroundPathColor: UIColor {
-        switch (highlighted, selected) {
+        switch (isHighlighted, isSelected) {
         case (true, _):
             return UIColor.protonome_mediumColor(withHue: colorHue, saturation: colorSaturation)
         case (_, true):
@@ -182,24 +184,24 @@ import AudioKit
 
 extension AudioPlot: CsoundBinding {
     
-    public func setup(csoundObj: CsoundObj) {
+    open func setup(_ csoundObj: CsoundObj) {
         csound = csoundObj
     }
     
-    public func updateValuesFromCsound() {
+    open func updateValuesFromCsound() {
         guard let csound = csound else {
             return
         }
         
         data = csound.getOutSamples()
         
-        var samples = [Float](count: data.length / sizeof(Float), repeatedValue: 0.0)
+        var samples = [Float](repeating: 0.0, count: data.count / MemoryLayout<Float>.size)
         
-        data.getBytes(&samples, length:data.length)
+        (data as NSData).getBytes(&samples, length:data.count)
         
-        dispatch_async(dispatch_get_main_queue(), { () -> Void in
+        DispatchQueue.main.async {
             self.samples = samples
-        })
+        }
     }
     
 }

@@ -12,7 +12,7 @@ import UIKit
 public protocol ParameterFormatter {
     
     /// Converts a value to a formatted string.
-    func string(forValue value: Float) -> String?
+    func string(for value: Float) -> String?
     
 }
 
@@ -20,19 +20,19 @@ public protocol ParameterFormatter {
 public protocol ParameterFormatterConstructor: ParameterFormatter {
     
     /// Constructs an NSNumberFormatter for a given value.
-    func formatter(forValue value: Float) -> NSNumberFormatter
+    func formatter(for value: Float) -> NumberFormatter
     
 }
 
 extension ParameterFormatterConstructor {
     
-    public func string(forValue value: Float) -> String? {
+    public func string(for value: Float) -> String? {
         // Don't print negative zero
-        guard (value.floatingPointClass != .NegativeZero) else {
-            return formatter(forValue: 0.0).stringFromNumber(NSNumber(float: 0.0))
+        guard (value.floatingPointClass != .negativeZero) else {
+            return formatter(for: 0.0).string(from: NSNumber(value: 0.0 as Float))
         }
         
-        return formatter(forValue: value).stringFromNumber(NSNumber(float: value))
+        return formatter(for: value).string(from: NSNumber(value: value as Float))
     }
     
 }
@@ -40,14 +40,14 @@ extension ParameterFormatterConstructor {
 /// A parameter formatter class which formats numbers, e.g.: `"1.2"`.
 public struct NumberParameterFormatter: ParameterFormatterConstructor {
     
-    public func formatter(forValue value: Float) -> NSNumberFormatter {
+    public func formatter(for value: Float) -> NumberFormatter {
         switch fabs(value) {
         case 0.0..<0.01:
-            return NSNumberFormatter(digits: 1)
+            return NumberFormatter(digits: 1)
         case 0.01..<1.0:
-            return NSNumberFormatter(digits: 2)
+            return NumberFormatter(digits: 2)
         default:
-            return NSNumberFormatter(digits: 1)
+            return NumberFormatter(digits: 1)
         }
     }
     
@@ -56,8 +56,8 @@ public struct NumberParameterFormatter: ParameterFormatterConstructor {
 /// A parameter formatter class which formats integers, e.g.: `"6"`.
 public struct IntegerParameterFormatter: ParameterFormatterConstructor {
     
-    public func formatter(forValue value: Float) -> NSNumberFormatter {
-        return NSNumberFormatter(digits: 0)
+    public func formatter(for value: Float) -> NumberFormatter {
+        return NumberFormatter(digits: 0)
     }
     
 }
@@ -65,8 +65,8 @@ public struct IntegerParameterFormatter: ParameterFormatterConstructor {
 /// A parameter formatter class which formats percentages, e.g.: `"50%"` for the value `7.5`.
 public struct PercentageParameterFormatter: ParameterFormatterConstructor {
     
-    public func formatter(forValue value: Float) -> NSNumberFormatter {
-        return NSNumberFormatter(digits: 0, multiplier: 100.0, suffix: "%")
+    public func formatter(for value: Float) -> NumberFormatter {
+        return NumberFormatter(digits: 0, multiplier: 100.0, suffix: "%")
     }
     
 }
@@ -74,20 +74,20 @@ public struct PercentageParameterFormatter: ParameterFormatterConstructor {
 /// A parameter formatter class which formats durations, e.g.: `"40ms"` for the value `0.04`.
 public struct DurationParameterFormatter: ParameterFormatterConstructor {
     
-    public func formatter(forValue value: Float) -> NSNumberFormatter {
+    public func formatter(for value: Float) -> NumberFormatter {
         switch fabs(value) {
         case 0.0:
-            return NSNumberFormatter(digits: 1, suffix: "s")
+            return NumberFormatter(digits: 1, suffix: "s")
         case 0.0..<0.00001:
-            return NSNumberFormatter(digits: 1, multiplier: 1000000.0, suffix: "µs")
+            return NumberFormatter(digits: 1, multiplier: 1000000.0, suffix: "µs")
         case 0.00001..<0.0001:
-            return NSNumberFormatter(digits: 2, multiplier: 1000000.0, suffix: "µs", rounding: .SignificantDigits)
+            return NumberFormatter(digits: 2, multiplier: 1000000.0, suffix: "µs", rounding: .significantDigits)
         case 0.0001..<0.1:
-            return NSNumberFormatter(digits: 2, multiplier: 1000.0, suffix: "ms", rounding: .SignificantDigits)
+            return NumberFormatter(digits: 2, multiplier: 1000.0, suffix: "ms", rounding: .significantDigits)
         case 0.1..<10.0:
-            return NSNumberFormatter(digits: 2, suffix: "s", rounding: .SignificantDigits)
+            return NumberFormatter(digits: 2, suffix: "s", rounding: .significantDigits)
         default:
-            return NSNumberFormatter(digits: 0, suffix: "s")
+            return NumberFormatter(digits: 0, suffix: "s")
         }
     }
     
@@ -96,12 +96,12 @@ public struct DurationParameterFormatter: ParameterFormatterConstructor {
 /// A parameter formatter class which formats amplitudes, e.g.: `"6.0dB"`.
 public struct AmplitudeParameterFormatter: ParameterFormatterConstructor {
     
-    public func formatter(forValue value: Float) -> NSNumberFormatter {
+    public func formatter(for value: Float) -> NumberFormatter {
         switch fabs(value) {
         case 0.0..<10.0:
-            return NSNumberFormatter(digits: 1, suffix: "dB")
+            return NumberFormatter(digits: 1, suffix: "dB")
         default:
-            return NSNumberFormatter(digits: 0, suffix: "dB")
+            return NumberFormatter(digits: 0, suffix: "dB")
         }
     }
     
@@ -110,16 +110,16 @@ public struct AmplitudeParameterFormatter: ParameterFormatterConstructor {
 /// A parameter formatter class which formats frequencies, e.g.: `"4.0kHz"` for the value `4000`.
 public struct FrequencyParameterFormatter: ParameterFormatterConstructor {
     
-    public func formatter(forValue value: Float) -> NSNumberFormatter {
+    public func formatter(for value: Float) -> NumberFormatter {
         switch (fabs(value)) {
         case 0.0..<1.0:
-            return NSNumberFormatter(digits: 1, suffix: "Hz")
+            return NumberFormatter(digits: 1, suffix: "Hz")
         case 1.0..<100.0:
-            return NSNumberFormatter(digits: 2, suffix: "Hz", rounding: .SignificantDigits)
+            return NumberFormatter(digits: 2, suffix: "Hz", rounding: .significantDigits)
         case 100.0..<1000.0:
-            return NSNumberFormatter(digits: 3, suffix: "Hz", rounding: .SignificantDigits)
+            return NumberFormatter(digits: 3, suffix: "Hz", rounding: .significantDigits)
         default:
-            return NSNumberFormatter(digits: 2, multiplier: 0.001, suffix: "kHz", rounding: .SignificantDigits)
+            return NumberFormatter(digits: 2, multiplier: 0.001, suffix: "kHz", rounding: .significantDigits)
         }
     }
     
@@ -131,7 +131,7 @@ public struct StringParameterFormatter: ParameterFormatter {
     /// The formatter's string.
     public var string: String?
     
-    public func string(forValue value: Float) -> String? {
+    public func string(for value: Float) -> String? {
         return string
     }
     
@@ -147,7 +147,7 @@ public struct SteppedParameterFormatter: ParameterFormatter {
     /// The formatter's steps - a dictionary of unique values to names.
     public var steps: [Float: String]
     
-    public func string(forValue value: Float) -> String? {
+    public func string(for value: Float) -> String? {
         return steps[value] ?? ""
     }
 
@@ -155,31 +155,31 @@ public struct SteppedParameterFormatter: ParameterFormatter {
 
 // MARK: - Private extensions
 
-private extension NSNumberFormatter {
+private extension NumberFormatter {
     
     enum Rounding {
-        case FractionDigits
-        case SignificantDigits
+        case fractionDigits
+        case significantDigits
     }
     
-    convenience init(digits: Int, multiplier: Float = 1, suffix: String? = nil, rounding: Rounding = .FractionDigits) {
+    convenience init(digits: Int, multiplier: Float = 1, suffix: String? = nil, rounding: Rounding = .fractionDigits) {
         self.init()
-        self.numberStyle = .DecimalStyle
+        self.numberStyle = .decimal
         
         switch rounding {
-        case .FractionDigits:
+        case .fractionDigits:
             self.usesSignificantDigits = false
             self.minimumFractionDigits = digits
             self.maximumFractionDigits = digits
             break
-        case .SignificantDigits:
+        case .significantDigits:
             self.usesSignificantDigits = true
             self.minimumSignificantDigits = digits
             self.maximumSignificantDigits = digits
             break
         }
         
-        self.multiplier = multiplier
+        self.multiplier = NSNumber(value: multiplier)
         
         self.positiveSuffix = suffix
         self.negativeSuffix = suffix

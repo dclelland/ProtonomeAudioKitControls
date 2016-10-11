@@ -12,7 +12,7 @@ import Lerp
 /// IBDesignable `AudioControl` subclass which draws a slider, which can be used to select a value from a grid of values.
 /// When the touch point is over the slider, its y position has a 1:1 ratio with the slider's value, but this decreases as the touch point moves further away from the slider.
 /// This way, the user can exert arbitrarily precise control over the dial, depending upon how far away their touch is from the slider.
-@IBDesignable public class SliderControl: AudioControl {
+@IBDesignable open class SliderControl: AudioControl {
     
     // MARK: - Views
     
@@ -20,7 +20,7 @@ import Lerp
     /// The constraints created for this label respect the layout margins, so they may be used to customise the padding around the value label.
     public lazy var valueLabel: UILabel = {
         let label = UILabel()
-        label.textAlignment = .Center
+        label.textAlignment = .center
         label.textColor = UIColor.protonome_blackColor()
         label.adjustsFontSizeToFitWidth = true
         return label
@@ -28,22 +28,22 @@ import Lerp
     
     // MARK: - Overrides
     
-    override public func layoutSubviews() {
+    override open func layoutSubviews() {
         super.layoutSubviews()
         
-        valueLabel.text = formatter.string(forValue: value)
+        valueLabel.text = formatter.string(for: value)
         valueLabel.font = font
     }
     
-    override public func updateConstraints() {
+    override open func updateConstraints() {
         super.updateConstraints()
         
         addSubview(valueLabel)
-        valueLabel.snp_updateConstraints { make in
-            make.top.equalTo(self.snp_topMargin)
-            make.left.equalTo(self.snp_leftMargin)
-            make.right.equalTo(self.snp_rightMargin)
-            make.height.equalTo(valueLabel.snp_width).multipliedBy(0.75)
+        valueLabel.snp.updateConstraints { make in
+            make.top.equalTo(snp.topMargin)
+            make.left.equalTo(snp.leftMargin)
+            make.right.equalTo(snp.rightMargin)
+            make.height.equalTo(valueLabel.snp.width).multipliedBy(0.75)
         }
     }
     
@@ -60,9 +60,9 @@ import Lerp
      
      - returns: A ratio, in range `0.0...1.0`.
      */
-    override public func ratio(forLocation location: CGPoint) -> Float {
+    override open func ratio(for location: CGPoint) -> Float {
         switch location.x {
-        case (-.max)..<bounds.minX:
+        case (-.greatestFiniteMagnitude)..<bounds.minX:
             let scale = bounds.minX - location.x
             let min = bounds.maxY + scale * exitRatio
             let max = bounds.minY - scale * (1.0 - exitRatio)
@@ -91,7 +91,7 @@ import Lerp
      
      - returns: A bezier path used for the slider control's indicator.
      */
-    override public func path(forRatio ratio: Float) -> UIBezierPath {
+    override open func path(for ratio: Float) -> UIBezierPath {
         let rect = CGRect(x: 0.0, y: 1.0 - CGFloat(ratio), width: 1.0, height: CGFloat(ratio))
         
         return UIBezierPath(rect: rect.lerp(rect: bounds))
