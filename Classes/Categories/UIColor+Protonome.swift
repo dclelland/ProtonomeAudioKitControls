@@ -17,7 +17,7 @@ public extension UIColor {
     // MARK: - Colors
     
     /// A low brightness color used for non highlighted audio control backgrounds.
-    public static func protonome_darkColor(withHue hue: CGFloat, saturation: CGFloat = 1.0, brightness: CGFloat = 1.0) -> UIColor {
+    public static func protonomeDark(hue: CGFloat, saturation: CGFloat = 1.0, brightness: CGFloat = 1.0) -> UIColor {
         return UIColor(
             hue: hue,
             saturation: saturation.clamp(min: 0.0, max: 1.0).lerp(min: 0.0, max: 0.5),
@@ -27,7 +27,7 @@ public extension UIColor {
     }
     
     /// A medium brightness color used for highlighted audio control backgrounds.
-    public static func protonome_mediumColor(withHue hue: CGFloat, saturation: CGFloat = 1.0, brightness: CGFloat = 1.0) -> UIColor {
+    public static func protonomeMedium(hue: CGFloat, saturation: CGFloat = 1.0, brightness: CGFloat = 1.0) -> UIColor {
         return UIColor(
             hue: hue,
             saturation: saturation.clamp(min: 0.0, max: 1.0).lerp(min: 0.0, max: 0.625),
@@ -37,7 +37,7 @@ public extension UIColor {
     }
     
     /// A high brightness color used for audio control foregrounds.
-    public static func protonome_lightColor(withHue hue: CGFloat, saturation: CGFloat = 1.0, brightness: CGFloat = 1.0) -> UIColor {
+    public static func protonomeLight(hue: CGFloat, saturation: CGFloat = 1.0, brightness: CGFloat = 1.0) -> UIColor {
         return UIColor(
             hue: hue,
             saturation: saturation.clamp(min: 0.0, max: 1.0).lerp(min: 0.0, max: 0.75),
@@ -49,27 +49,27 @@ public extension UIColor {
     // MARK: - Greyscale colors
     
     /// A default black color.
-    public static func protonome_blackColor() -> UIColor {
+    public static var protonomeBlack: UIColor {
         return UIColor(white: 0.0, alpha: 1.0)
     }
     
     /// A default dark gray color.
-    public static func protonome_darkGrayColor() -> UIColor {
+    public static var protonomeDarkGray: UIColor {
         return UIColor(white: 0.2, alpha: 1.0)
     }
     
     /// A default medium gray color.
-    public static func protonome_mediumGrayColor() -> UIColor {
+    public static var protonomeMediumGray: UIColor {
         return UIColor(white: 0.25, alpha: 1.0)
     }
     
     /// A default light gray color.
-    public static func protonome_lightGrayColor() -> UIColor {
+    public static var protonomeLightGray: UIColor {
         return UIColor(white: 0.3, alpha: 1.0)
     }
     
     /// A default white color.
-    public static func protonome_whiteColor() -> UIColor {
+    public static var protonomeWhite: UIColor {
         return UIColor(white: 1.0, alpha: 1.0)
     }
 

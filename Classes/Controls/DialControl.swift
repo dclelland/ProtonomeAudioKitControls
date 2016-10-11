@@ -34,7 +34,7 @@ import SnapKit
     public lazy var valueLabel: UILabel = {
         let label = UILabel()
         label.textAlignment = .center
-        label.textColor = UIColor.protonome_blackColor()
+        label.textColor = .protonomeBlack
         label.adjustsFontSizeToFitWidth = true
         return label
     }()

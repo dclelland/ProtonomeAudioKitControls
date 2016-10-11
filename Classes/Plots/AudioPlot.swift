@@ -168,16 +168,16 @@ import AudioKit
     private var backgroundPathColor: UIColor {
         switch (isHighlighted, isSelected) {
         case (true, _):
-            return UIColor.protonome_mediumColor(withHue: colorHue, saturation: colorSaturation)
+            return .protonomeMedium(hue: colorHue, saturation: colorSaturation)
         case (_, true):
-            return UIColor.protonome_darkColor(withHue: colorHue, saturation: colorSaturation)
+            return .protonomeDark(hue: colorHue, saturation: colorSaturation)
         default:
-            return UIColor.protonome_darkGrayColor()
+            return .protonomeDarkGray
         }
     }
     
     private var foregroundPathColor: UIColor {
-        return UIColor.protonome_lightColor(withHue: colorHue, saturation: colorSaturation)
+        return .protonomeLight(hue: colorHue, saturation: colorSaturation)
     }
     
 }

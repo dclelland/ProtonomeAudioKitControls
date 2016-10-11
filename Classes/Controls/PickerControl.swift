@@ -123,7 +123,7 @@ import UIKit
         label.text = formatter.string(for: scale.value(for: ratio(for: index)))
         label.font = font
         label.textAlignment = .center
-        label.textColor = UIColor.protonome_blackColor()
+        label.textColor = .protonomeBlack
         label.adjustsFontSizeToFitWidth = true
         return label
     }

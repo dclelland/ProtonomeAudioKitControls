@@ -253,7 +253,7 @@ import SnapKit
     public lazy var titleLabel: UILabel = {
         let label = UILabel()
         label.textAlignment = .center
-        label.textColor = UIColor.protonome_blackColor()
+        label.textColor = .protonomeBlack
         label.adjustsFontSizeToFitWidth = true
         return label
     }()
@@ -429,9 +429,9 @@ import SnapKit
     
     private var backgroundPathColor: UIColor {
         if (isHighlighted || isSelected) {
-            return UIColor.protonome_mediumColor(withHue: hue)
+            return .protonomeMedium(hue: hue)
         } else {
-            return UIColor.protonome_darkColor(withHue: hue)
+            return .protonomeDark(hue: hue)
         }
     }
     
@@ -440,7 +440,7 @@ import SnapKit
     }
     
     private var foregroundPathColor: UIColor {
-        return UIColor.protonome_lightColor(withHue: hue)
+        return .protonomeLight(hue: hue)
     }
 
 }
