@@ -108,12 +108,12 @@ import SnapKit
         let pointerB = pol2rec(r: radius * 1.25, θ: angle)
         let pointerC = pol2rec(r: radius * 0.75, θ: angle + 45°)
         
-        return UIBezierPath.makePath { make in
-            make.oval(at: center, radius: radius)
-            make.move(x: center.x + pointerA.x, y: center.y + pointerA.y)
-            make.line(x: center.x + pointerB.x, y: center.y + pointerB.y)
-            make.line(x: center.x + pointerC.x, y: center.y + pointerC.y)
-            make.close()
+        return UIBezierPath { path in
+            path.add(.oval, center: center, radius: radius)
+            path.add(.move, x: center.x + pointerA.x, y: center.y + pointerA.y)
+            path.add(.line, x: center.x + pointerB.x, y: center.y + pointerB.y)
+            path.add(.line, x: center.x + pointerC.x, y: center.y + pointerC.y)
+            path.close()
         }
     }
     

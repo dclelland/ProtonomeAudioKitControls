@@ -18,8 +18,8 @@ Pod::Spec.new do |s|
   s.requires_arc            = true
   
   s.dependency 'AudioKit', '~> 2.0'
-  s.dependency 'Bezzy'
-  s.dependency 'Degrad'
-  s.dependency 'Lerp'
-  s.dependency 'SnapKit'
+  s.dependency 'Bezzy', '~> 1.0'
+  s.dependency 'Degrad', '~> 1.0'
+  s.dependency 'Lerp', '~> 2.0'
+  s.dependency 'SnapKit', '~> 3.0'
 end
