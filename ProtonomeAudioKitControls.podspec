@@ -7,17 +7,17 @@
 Pod::Spec.new do |s|
   s.name                    = "ProtonomeAudioKitControls"
   s.version                 = "1.0.0"
-  s.summary                 = "ProtonomeAudioKitControls is a collection of IBDesignable-compatible controls for use with AudioKit 2."
+  s.summary                 = "ProtonomeAudioKitControls is a collection of IBDesignable-compatible controls for use with AudioKit 3."
   s.homepage                = "https://github.com/dclelland/ProtonomeAudioKitControls"
   s.license                 = { :type => 'MIT' }
   s.author                  = { "Daniel Clelland" => "daniel.clelland@gmail.com" }
   s.source                  = { :git => "https://github.com/dclelland/ProtonomeAudioKitControls.git", :tag => "1.0.0" }
-  s.platform                = :ios, '8.0'
-  s.ios.deployment_target   = '8.0'
+  s.platform                = :ios, '9.0'
+  s.ios.deployment_target   = '9.0'
   s.ios.source_files        = 'Classes/**/*.swift'
   s.requires_arc            = true
   
-  s.dependency 'AudioKit', '~> 2.0'
+  s.dependency 'AudioKit', '~> 3.4'
   s.dependency 'Bezzy', '~> 1.0'
   s.dependency 'Degrad', '~> 1.0'
   s.dependency 'Lerp', '~> 2.0'

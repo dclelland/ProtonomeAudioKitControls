@@ -28,7 +28,7 @@ import SnapKit
     // MARK: Value
     
     /// The control's current value. Changing this triggers a new layout and display, and fires a `.ValueChanged` control event.
-    @IBInspectable public var value: Float = 0.0 {
+    @IBInspectable public var value: Double = 0.0 {
         didSet {
             setNeedsLayout()
             setNeedsDisplay()
@@ -88,21 +88,21 @@ import SnapKit
     }
     
     /// A minimum value, used by the linear, logarithmic, exponential, or integer scales.
-    @IBInspectable public var scaleMin: Float = 1.0 {
+    @IBInspectable public var scaleMin: Double = 1.0 {
         didSet {
             setNeedsLayout()
         }
     }
     
     /// A maximum value, used by the linear, logarithmic, exponential, or integer scales.
-    @IBInspectable public var scaleMax: Float = 0.0 {
+    @IBInspectable public var scaleMax: Double = 0.0 {
         didSet {
             setNeedsLayout()
         }
     }
     
     /// An exponent value, used by the exponential scale.
-    @IBInspectable public var scaleExponent: Float = 1.0 {
+    @IBInspectable public var scaleExponent: Double = 1.0 {
         didSet {
             setNeedsLayout()
         }
@@ -117,8 +117,8 @@ import SnapKit
         }
     }
     
-    private var scaleValues: [Float] {
-        return scaleSteps.characters.split(separator: ",").map { Float(String($0))! }
+    private var scaleValues: [Double] {
+        return scaleSteps.characters.split(separator: ",").map { Double(String($0))! }
     }
     
     // MARK: Formatter
@@ -147,7 +147,7 @@ import SnapKit
         case .String:
             return StringParameterFormatter(string: formatterString)
         case .Stepped:
-            let steps = NSDictionary(objects: formatterValues, forKeys: scaleValues as [NSCopying]) as! [Float: String]
+            let steps = NSDictionary(objects: formatterValues, forKeys: scaleValues as [NSCopying]) as! [Double: String]
             return SteppedParameterFormatter(steps: steps)
         }
     }
@@ -334,7 +334,7 @@ import SnapKit
     }
     
     /// A callback block, called when a `.ValueChanged` control event fires, i.e. when `value` is set.
-    public var onChangeValue: ((_ value: Float) -> Void)?
+    public var onChangeValue: ((_ value: Double) -> Void)?
     
     internal func valueChanged() {
         onChangeValue?(value)
@@ -402,7 +402,7 @@ import SnapKit
      
      - returns: A ratio, in range `0.0...1.0`.
      */
-    open func ratio(for location: CGPoint) -> Float {
+    open func ratio(for location: CGPoint) -> Double {
         fatalError("Subclasses of ParameterControl must override ratio(forLocation:)")
     }
     
@@ -413,7 +413,7 @@ import SnapKit
      
      - returns: A bezier path used for the control's foreground.
      */
-    open func path(for ratio: Float) -> UIBezierPath {
+    open func path(for ratio: Double) -> UIBezierPath {
         fatalError("Subclasses of ParameterControl must override path(forRatio:)")
     }
     

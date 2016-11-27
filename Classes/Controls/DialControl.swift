@@ -18,13 +18,13 @@ import SnapKit
     
     // MARK: - Private constants
     
-    private let dialRadius: Float = 0.375
+    private let dialRadius: Double = 0.375
     
-    private let minimumAngle: Float = 45°
-    private let maximumAngle: Float = 315°
+    private let minimumAngle: Double = 45°
+    private let maximumAngle: Double = 315°
     
-    private let minimumDeadZone: Float = 2°
-    private let maximumDeadZone: Float = 358°
+    private let minimumDeadZone: Double = 2°
+    private let maximumDeadZone: Double = 358°
     
     // MARK: - Views
     
@@ -70,12 +70,12 @@ import SnapKit
      
      - returns: A ratio, in range `0.0...1.0`.
      */
-    override open func ratio(for location: CGPoint) -> Float {
+    override open func ratio(for location: CGPoint) -> Double {
         let center = valueLabel.center
-        let radius = dialRadius * Float(min(valueLabel.frame.height, valueLabel.frame.width))
+        let radius = dialRadius * Double(min(valueLabel.frame.height, valueLabel.frame.width))
         
-        let distance = Float(hypot(location.y - center.y, location.x - center.x))
-        let angle = Float(atan2(location.y - center.y, location.x - center.x))
+        let distance = Double(hypot(location.y - center.y, location.x - center.x))
+        let angle = Double(atan2(location.y - center.y, location.x - center.x))
         
         guard radius < distance else {
             return scale.ratio(for: value)
@@ -98,7 +98,7 @@ import SnapKit
      
      - returns: A bezier path used for the dial control's indicator.
      */
-    override open func path(for ratio: Float) -> UIBezierPath {
+    override open func path(for ratio: Double) -> UIBezierPath {
         let center = valueLabel.center
         
         let radius = CGFloat(dialRadius) * min(valueLabel.frame.height, valueLabel.frame.width)

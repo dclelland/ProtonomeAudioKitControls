@@ -76,13 +76,13 @@ import UIKit
      
      - returns: A ratio, in range `0.0...1.0`.
      */
-    override open func ratio(for location: CGPoint) -> Float {
+    override open func ratio(for location: CGPoint) -> Double {
         let location = location.ilerp(rect: containerView.frame)
         
-        let column = floor((Float(location.x) * Float(gridColumns)).clamp(min: 0.0, max: Float(gridColumns - 1)))
-        let row = floor((Float(location.y) * Float(gridRows)).clamp(min: 0.0, max: Float(gridRows - 1)))
+        let column = floor((Double(location.x) * Double(gridColumns)).clamp(min: 0.0, max: Double(gridColumns - 1)))
+        let row = floor((Double(location.y) * Double(gridRows)).clamp(min: 0.0, max: Double(gridRows - 1)))
         
-        let index = UInt((Float(row) * Float(gridColumns) + column).clamp(min: 0.0, max: Float(gridCells - 1)))
+        let index = UInt((Double(row) * Double(gridColumns) + column).clamp(min: 0.0, max: Double(gridCells - 1)))
         
         return ratio(for: index)
     }
@@ -95,7 +95,7 @@ import UIKit
      
      - returns: A bezier path used for the dial control's indicator.
      */
-    override open func path(for ratio: Float) -> UIBezierPath {
+    override open func path(for ratio: Double) -> UIBezierPath {
         let index = self.index(for: ratio)
         return UIBezierPath.init(roundedRect: cell(for: index), cornerRadius: cornerRadius)
     }
@@ -110,12 +110,12 @@ import UIKit
         return gridColumns * gridRows
     }
     
-    private func index(for ratio: Float) -> UInt {
-        return UInt(round(ratio * Float(gridCells - 1)))
+    private func index(for ratio: Double) -> UInt {
+        return UInt(round(ratio * Double(gridCells - 1)))
     }
     
-    private func ratio(for index: UInt) -> Float {
-        return Float(index) / Float(gridCells - 1)
+    private func ratio(for index: UInt) -> Double {
+        return Double(index) / Double(gridCells - 1)
     }
     
     private func valueLabel(for index: UInt) -> UILabel {

@@ -13,10 +13,10 @@ import Lerp
 protocol ParameterScale {
     
     /// Converts a ratio in range `0.0...1.0` to a useful value.
-    func value(for ratio: Float) -> Float
+    func value(for ratio: Double) -> Double
     
     /// Converts a value to a ratio in range `0.0...1.0`.
-    func ratio(for value: Float) -> Float
+    func ratio(for value: Double) -> Double
     
 }
 
@@ -26,16 +26,16 @@ protocol ParameterScale {
 struct LinearParameterScale: ParameterScale {
     
     /// The scale's minimum value.
-    var minimum: Float
+    var minimum: Double
     
     /// The scale's maximum value.
-    var maximum: Float
+    var maximum: Double
     
-    func value(for ratio: Float) -> Float {
+    func value(for ratio: Double) -> Double {
         return ratio.clamp(min: 0.0, max: 1.0).lerp(min: minimum, max: maximum)
     }
     
-    func ratio(for value: Float) -> Float {
+    func ratio(for value: Double) -> Double {
         return value.ilerp(min: minimum, max: maximum).clamp(min: 0.0, max: 1.0)
     }
     
@@ -48,16 +48,16 @@ struct LinearParameterScale: ParameterScale {
 struct LogarithmicParameterScale: ParameterScale {
     
     /// The scale's minimum value.
-    var minimum: Float
+    var minimum: Double
     
     /// The scale's maximum value.
-    var maximum: Float
+    var maximum: Double
     
-    func value(for ratio: Float) -> Float {
+    func value(for ratio: Double) -> Double {
         return minimum * pow(maximum / minimum, ratio.clamp(min: 0.0, max: 1.0))
     }
     
-    func ratio(for value: Float) -> Float {
+    func ratio(for value: Double) -> Double {
         return log(value / minimum) / log(maximum / minimum)
     }
     
@@ -69,19 +69,19 @@ struct LogarithmicParameterScale: ParameterScale {
 struct ExponentialParameterScale: ParameterScale {
     
     /// The scale's minimum value.
-    var minimum: Float
+    var minimum: Double
     
     /// The scale's maximum value.
-    var maximum: Float
+    var maximum: Double
     
     /// The scale's exponent.
-    var exponent: Float
+    var exponent: Double
     
-    func value(for ratio: Float) -> Float {
+    func value(for ratio: Double) -> Double {
         return pow(ratio.clamp(min: 0.0, max: 1.0), exponent).lerp(min: minimum, max: maximum)
     }
     
-    func ratio(for value: Float) -> Float {
+    func ratio(for value: Double) -> Double {
         return pow(value.ilerp(min: minimum, max: maximum), 1.0 / exponent).clamp(min: 0.0, max: 1.0)
     }
     
@@ -93,16 +93,16 @@ struct ExponentialParameterScale: ParameterScale {
 struct IntegerParameterScale: ParameterScale {
     
     /// The scale's minimum value.
-    var minimum: Float
+    var minimum: Double
     
     /// The scale's maximum value.
-    var maximum: Float
+    var maximum: Double
     
-    func value(for ratio: Float) -> Float {
+    func value(for ratio: Double) -> Double {
         return round(ratio.clamp(min: 0.0, max: 1.0).lerp(min: minimum, max: maximum))
     }
     
-    func ratio(for value: Float) -> Float {
+    func ratio(for value: Double) -> Double {
         return round(value).ilerp(min: minimum, max: maximum).clamp(min: 0.0, max: 1.0)
     }
 
@@ -117,23 +117,23 @@ struct IntegerParameterScale: ParameterScale {
 struct SteppedParameterScale: ParameterScale {
     
     /// The scale's list of value steps.
-    var values: [Float]
+    var values: [Double]
     
-    func value(for ratio: Float) -> Float {
+    func value(for ratio: Double) -> Double {
         return value(forIndex: index(forRatio: ratio))
     }
     
-    func ratio(for value: Float) -> Float {
+    func ratio(for value: Double) -> Double {
         return ratio(forIndex: index(forValue: value))
     }
     
     // MARK: Ratio to index to value
     
-    private func index(forRatio ratio: Float) -> Int {
-        return Int(round(ratio * Float(values.count - 1)))
+    private func index(forRatio ratio: Double) -> Int {
+        return Int(round(ratio * Double(values.count - 1)))
     }
     
-    private func value(forIndex index: Int) -> Float {
+    private func value(forIndex index: Int) -> Double {
         if (values.indices.contains(index)) {
             return values[index]
         } else {
@@ -143,12 +143,12 @@ struct SteppedParameterScale: ParameterScale {
     
     // MARK: Value to index to ratio
     
-    private func index(forValue value: Float) -> Int {
+    private func index(forValue value: Double) -> Int {
         return values.index(of: value) ?? 0
     }
     
-    private func ratio(forIndex index: Int) -> Float {
-        return Float(index) / Float(values.count - 1)
+    private func ratio(forIndex index: Int) -> Double {
+        return Double(index) / Double(values.count - 1)
     }
     
 }

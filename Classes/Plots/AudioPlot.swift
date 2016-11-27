@@ -7,7 +7,7 @@
 //
 
 import UIKit
-import AudioKit
+//import AudioKit
 
 /// IBDesignable `UIControl` subclass which draws the current CSound buffer as a waveform in `drawRect:`.
 @IBDesignable open class AudioPlot: UIControl {
@@ -64,7 +64,7 @@ import AudioKit
     
     // MARK: - Private vars
     
-    fileprivate var csound: CsoundObj?
+//    fileprivate var csound: CsoundObj?
     
     fileprivate var data = Data()
     
@@ -76,9 +76,9 @@ import AudioKit
     
     // MARK: - Initialization
     
-    deinit {
-        AKManager.removeBinding(self)
-    }
+//    deinit {
+//        AKManager.removeBinding(self)
+//    }
     
     // MARK: - Overrides
     
@@ -94,15 +94,15 @@ import AudioKit
         samples = testSamples
     }
     
-    override open func didMoveToSuperview() {
-        super.didMoveToSuperview()
-        
-        if (superview == nil) {
-            AKManager.removeBinding(self)
-        } else {
-            AKManager.addBinding(self)
-        }
-    }
+//    override open func didMoveToSuperview() {
+//        super.didMoveToSuperview()
+//        
+//        if (superview == nil) {
+//            AKManager.removeBinding(self)
+//        } else {
+//            AKManager.addBinding(self)
+//        }
+//    }
     
     override open func draw(_ rect: CGRect) {
         guard let context = UIGraphicsGetCurrentContext() else {
@@ -182,26 +182,26 @@ import AudioKit
     
 }
 
-extension AudioPlot: CsoundBinding {
-    
-    open func setup(_ csoundObj: CsoundObj) {
-        csound = csoundObj
-    }
-    
-    open func updateValuesFromCsound() {
-        guard let csound = csound else {
-            return
-        }
-        
-        data = csound.getOutSamples()
-        
-        var samples = [Float](repeating: 0.0, count: data.count / MemoryLayout<Float>.size)
-        
-        (data as NSData).getBytes(&samples, length:data.count)
-        
-        DispatchQueue.main.async {
-            self.samples = samples
-        }
-    }
-    
-}
+//extension AudioPlot: CsoundBinding {
+//    
+//    open func setup(_ csoundObj: CsoundObj) {
+//        csound = csoundObj
+//    }
+//    
+//    open func updateValuesFromCsound() {
+//        guard let csound = csound else {
+//            return
+//        }
+//        
+//        data = csound.getOutSamples()
+//        
+//        var samples = [Float](repeating: 0.0, count: data.count / MemoryLayout<Float>.size)
+//        
+//        (data as NSData).getBytes(&samples, length:data.count)
+//        
+//        DispatchQueue.main.async {
+//            self.samples = samples
+//        }
+//    }
+//    
+//}

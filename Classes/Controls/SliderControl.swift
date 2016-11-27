@@ -60,26 +60,26 @@ import Lerp
      
      - returns: A ratio, in range `0.0...1.0`.
      */
-    override open func ratio(for location: CGPoint) -> Float {
+    override open func ratio(for location: CGPoint) -> Double {
         switch location.x {
         case (-.greatestFiniteMagnitude)..<bounds.minX:
             let scale = bounds.minX - location.x
             let min = bounds.maxY + scale * exitRatio
             let max = bounds.minY - scale * (1.0 - exitRatio)
             let ratio = location.y.ilerp(min: min, max: max).clamp(min: 0.0, max: 1.0)
-            return Float(ratio)
+            return Double(ratio)
         case bounds.minX...bounds.maxX:
             let min = bounds.maxY
             let max = bounds.minY
             let ratio = location.y.ilerp(min: min, max: max).clamp(min: 0.0, max: 1.0)
             exitRatio = ratio
-            return Float(ratio)
+            return Double(ratio)
         default:
             let scale = location.x - bounds.maxX
             let min = bounds.maxY + scale * exitRatio
             let max = bounds.minY - scale * (1.0 - exitRatio)
             let ratio = location.y.ilerp(min: min, max: max)
-            return Float(ratio).clamp(min: 0.0, max: 1.0)
+            return Double(ratio).clamp(min: 0.0, max: 1.0)
         }
     }
     
@@ -91,7 +91,7 @@ import Lerp
      
      - returns: A bezier path used for the slider control's indicator.
      */
-    override open func path(for ratio: Float) -> UIBezierPath {
+    override open func path(for ratio: Double) -> UIBezierPath {
         let rect = CGRect(x: 0.0, y: 1.0 - CGFloat(ratio), width: 1.0, height: CGFloat(ratio))
         
         return UIBezierPath(rect: rect.lerp(rect: bounds))

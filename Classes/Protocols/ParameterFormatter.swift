@@ -12,7 +12,7 @@ import UIKit
 public protocol ParameterFormatter {
     
     /// Converts a value to a formatted string.
-    func string(for value: Float) -> String?
+    func string(for value: Double) -> String?
     
 }
 
@@ -20,19 +20,19 @@ public protocol ParameterFormatter {
 public protocol ParameterFormatterConstructor: ParameterFormatter {
     
     /// Constructs an NSNumberFormatter for a given value.
-    func formatter(for value: Float) -> NumberFormatter
+    func formatter(for value: Double) -> NumberFormatter
     
 }
 
 extension ParameterFormatterConstructor {
     
-    public func string(for value: Float) -> String? {
+    public func string(for value: Double) -> String? {
         // Don't print negative zero
         guard (value.floatingPointClass != .negativeZero) else {
-            return formatter(for: 0.0).string(from: NSNumber(value: 0.0 as Float))
+            return formatter(for: 0.0).string(from: NSNumber(value: 0.0 as Double))
         }
         
-        return formatter(for: value).string(from: NSNumber(value: value as Float))
+        return formatter(for: value).string(from: NSNumber(value: value as Double))
     }
     
 }
@@ -40,7 +40,7 @@ extension ParameterFormatterConstructor {
 /// A parameter formatter class which formats numbers, e.g.: `"1.2"`.
 public struct NumberParameterFormatter: ParameterFormatterConstructor {
     
-    public func formatter(for value: Float) -> NumberFormatter {
+    public func formatter(for value: Double) -> NumberFormatter {
         switch fabs(value) {
         case 0.0..<0.01:
             return NumberFormatter(digits: 1)
@@ -56,7 +56,7 @@ public struct NumberParameterFormatter: ParameterFormatterConstructor {
 /// A parameter formatter class which formats integers, e.g.: `"6"`.
 public struct IntegerParameterFormatter: ParameterFormatterConstructor {
     
-    public func formatter(for value: Float) -> NumberFormatter {
+    public func formatter(for value: Double) -> NumberFormatter {
         return NumberFormatter(digits: 0)
     }
     
@@ -65,7 +65,7 @@ public struct IntegerParameterFormatter: ParameterFormatterConstructor {
 /// A parameter formatter class which formats percentages, e.g.: `"50%"` for the value `7.5`.
 public struct PercentageParameterFormatter: ParameterFormatterConstructor {
     
-    public func formatter(for value: Float) -> NumberFormatter {
+    public func formatter(for value: Double) -> NumberFormatter {
         return NumberFormatter(digits: 0, multiplier: 100.0, suffix: "%")
     }
     
@@ -74,7 +74,7 @@ public struct PercentageParameterFormatter: ParameterFormatterConstructor {
 /// A parameter formatter class which formats durations, e.g.: `"40ms"` for the value `0.04`.
 public struct DurationParameterFormatter: ParameterFormatterConstructor {
     
-    public func formatter(for value: Float) -> NumberFormatter {
+    public func formatter(for value: Double) -> NumberFormatter {
         switch fabs(value) {
         case 0.0:
             return NumberFormatter(digits: 1, suffix: "s")
@@ -96,7 +96,7 @@ public struct DurationParameterFormatter: ParameterFormatterConstructor {
 /// A parameter formatter class which formats amplitudes, e.g.: `"6.0dB"`.
 public struct AmplitudeParameterFormatter: ParameterFormatterConstructor {
     
-    public func formatter(for value: Float) -> NumberFormatter {
+    public func formatter(for value: Double) -> NumberFormatter {
         switch fabs(value) {
         case 0.0..<10.0:
             return NumberFormatter(digits: 1, suffix: "dB")
@@ -110,7 +110,7 @@ public struct AmplitudeParameterFormatter: ParameterFormatterConstructor {
 /// A parameter formatter class which formats frequencies, e.g.: `"4.0kHz"` for the value `4000`.
 public struct FrequencyParameterFormatter: ParameterFormatterConstructor {
     
-    public func formatter(for value: Float) -> NumberFormatter {
+    public func formatter(for value: Double) -> NumberFormatter {
         switch (fabs(value)) {
         case 0.0..<1.0:
             return NumberFormatter(digits: 1, suffix: "Hz")
@@ -131,7 +131,7 @@ public struct StringParameterFormatter: ParameterFormatter {
     /// The formatter's string.
     public var string: String?
     
-    public func string(for value: Float) -> String? {
+    public func string(for value: Double) -> String? {
         return string
     }
     
@@ -145,9 +145,9 @@ public struct StringParameterFormatter: ParameterFormatter {
 public struct SteppedParameterFormatter: ParameterFormatter {
     
     /// The formatter's steps - a dictionary of unique values to names.
-    public var steps: [Float: String]
+    public var steps: [Double: String]
     
-    public func string(for value: Float) -> String? {
+    public func string(for value: Double) -> String? {
         return steps[value] ?? ""
     }
 
@@ -162,7 +162,7 @@ private extension NumberFormatter {
         case significantDigits
     }
     
-    convenience init(digits: Int, multiplier: Float = 1, suffix: String? = nil, rounding: Rounding = .fractionDigits) {
+    convenience init(digits: Int, multiplier: Double = 1, suffix: String? = nil, rounding: Rounding = .fractionDigits) {
         self.init()
         self.numberStyle = .decimal
         
