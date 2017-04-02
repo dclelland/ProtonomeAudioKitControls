@@ -11,7 +11,7 @@ import AudioKit
 // MARK: Conversion
 
 /// Protocol for converting numeric values to AKConstants.
-protocol AKConvertible {
+public protocol AKConvertible {
     
     /// Get an AKConstant.
     var ak: AKConstant { get }
@@ -21,7 +21,7 @@ protocol AKConvertible {
 extension Int: AKConvertible {
     
     /// Get an AKConstant.
-    var ak: AKConstant {
+    public var ak: AKConstant {
         return AKConstant(integer: self)
     }
 
@@ -30,7 +30,7 @@ extension Int: AKConvertible {
 extension Float: AKConvertible {
     
     /// Get an AKConstant.
-    var ak: AKConstant {
+    public var ak: AKConstant {
         return AKConstant(float: self)
     }
 
@@ -39,7 +39,7 @@ extension Float: AKConvertible {
 extension Double: AKConvertible {
     
     /// Get an AKConstant.
-    var ak: AKConstant {
+    public var ak: AKConstant {
         return AKConstant(float: Float(self))
     }
 
@@ -48,53 +48,53 @@ extension Double: AKConvertible {
 // MARK: Operators
 
 /// Sum two parameters.
-func +<T: AKParameter, U: AKParameter> (left: T, right: U) -> T {
+public func +<T: AKParameter, U: AKParameter> (left: T, right: U) -> T {
     return left.plus(right)
 }
 
 /// Subtract one parameter from another.
-func -<T: AKParameter, U: AKParameter> (left: T, right: U) -> T {
+public func -<T: AKParameter, U: AKParameter> (left: T, right: U) -> T {
     return left.minus(right)
 }
 
 /// Multiply two parameters.
-func *<T: AKParameter, U: AKParameter> (left: T, right: U) -> T {
+public func *<T: AKParameter, U: AKParameter> (left: T, right: U) -> T {
     return left.scaled(by: right)
 }
 
 /// Divide one parameter by another.
-func /<T: AKParameter, U: AKParameter> (left: T, right: U) -> T {
+public func /<T: AKParameter, U: AKParameter> (left: T, right: U) -> T {
     return left.divided(by: right)
 }
 
 // MARK: Trig functions
 
 /// Take the sine of a parameter.
-func sin(_ x: AKParameter) -> AKParameter {
+public func sin(_ x: AKParameter) -> AKParameter {
     return AKSingleInputMathOperation(functionString: "sin", input: x)
 }
 
 /// Take the cosine of a parameter.
-func cos(_ x: AKParameter) -> AKParameter {
+public func cos(_ x: AKParameter) -> AKParameter {
     return AKSingleInputMathOperation(functionString: "cos", input: x)
 }
 
 /// Take the tangent of a parameter.
-func tan(_ x: AKParameter) -> AKParameter {
+public func tan(_ x: AKParameter) -> AKParameter {
     return AKSingleInputMathOperation(functionString: "tan", input: x)
 }
 
 /// Take the hyperbolic sine of a parameter.
-func sinh(_ x: AKParameter) -> AKParameter {
+public func sinh(_ x: AKParameter) -> AKParameter {
     return AKSingleInputMathOperation(functionString: "sinh", input: x)
 }
 
 /// Take the hyperbolic cosine of a parameter.
-func cosh(_ x: AKParameter) -> AKParameter {
+public func cosh(_ x: AKParameter) -> AKParameter {
     return AKSingleInputMathOperation(functionString: "cosh", input: x)
 }
 
 /// Take the hyperbolic tangent of a parameter.
-func tanh(_ x: AKParameter) -> AKParameter {
+public func tanh(_ x: AKParameter) -> AKParameter {
     return AKSingleInputMathOperation(functionString: "tanh", input: x)
 }
