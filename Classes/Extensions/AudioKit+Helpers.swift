@@ -18,6 +18,15 @@ public protocol AKConvertible {
 
 }
 
+extension UInt: AKConvertible {
+    
+    /// Get an AKConstant.
+    public var ak: AKConstant {
+        return AKConstant(integer: Int(self))
+    }
+    
+}
+
 extension Int: AKConvertible {
     
     /// Get an AKConstant.
