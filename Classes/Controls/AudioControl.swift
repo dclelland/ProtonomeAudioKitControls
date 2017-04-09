@@ -317,7 +317,7 @@ import SnapKit
             case .phone:
                 return UIEdgeInsets(top: 4.0, left: 4.0, bottom: 4.0, right: 4.0)
             default:
-                fatalError("Device not supported")
+                return super.layoutMargins
             }
         }
         set {
