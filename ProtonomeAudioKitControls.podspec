@@ -15,10 +15,11 @@ Pod::Spec.new do |s|
   s.platform                = :ios, '8.0'
   s.ios.deployment_target   = '8.0'
   s.ios.source_files        = 'Classes/**/*.swift'
+  s.swift_version           = '4.2'
   s.requires_arc            = true
   
-  s.dependency 'Bezzy', '~> 1.0'
-  s.dependency 'Degrad', '~> 1.0'
-  s.dependency 'Lerp', '~> 2.0'
-  s.dependency 'SnapKit', '~> 3.0'
+  s.dependency 'Bezzy', '~> 1.3'
+  s.dependency 'Degrad', '~> 1.1'
+  s.dependency 'Lerp', '~> 2.1'
+  s.dependency 'SnapKit', '~> 4.2'
 end
